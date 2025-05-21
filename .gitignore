@@ -1,2 +1,31 @@
-.idea
+# IDEs y configuración global
+.idea/
+.DS_Store
 
+#### FRONTEND ###########################
+# Frontend specific (carpeta frontend/)
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/logs/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+frontend/*.local
+
+# Archivos de configuración de editores
+frontend/.vscode/
+!frontend/.vscode/extensions.json
+frontend/.idea/
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+# Otros patrones generales
+logs/
+*.log
