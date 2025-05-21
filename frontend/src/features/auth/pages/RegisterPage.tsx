@@ -37,21 +37,82 @@ const RegisterPage = () => {
     };
 
     return (
-        <div>
-            <h2>Registro</h2>
-            <input name="nombre" placeholder="Nombre" value={form.nombre} onChange={handleChange} />
-            <input name="apellido" placeholder="Apellido" value={form.apellido} onChange={handleChange} />
-            <input name="telefono" placeholder="Teléfono (8 dígitos)" value={form.telefono} onChange={handleChange} />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-            <input name="contrasena" placeholder="Contraseña" type="password" value={form.contrasena} onChange={handleChange} />
-            <input name="confirmar" placeholder="Confirmar contraseña" type="password" value={form.confirmar} onChange={handleChange} />
-            <input name="direccion" placeholder="Dirección" value={form.direccion} onChange={handleChange} />
-            <button onClick={handleSubmit}>Registrarse</button>
-            {error && <div>{error}</div>}
-            {success && <div>{success}</div>}
-            <p><Link to="/login">¿Ya tenés cuenta?</Link></p>
+        <div className="flex min-h-screen items-center justify-center bg-background px-4">
+            <div className="w-full max-w-md bg-surface p-8 rounded-xl shadow-md">
+                <h2 className="text-3xl font-bold text-center text-text mb-6">Registro</h2>
+
+                {error && <div className="text-error text-center mb-4">{error}</div>}
+                {success && <div className="text-green-600 text-center mb-4">{success}</div>}
+
+                <input
+                    name="nombre"
+                    placeholder="Nombre"
+                    value={form.nombre}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="apellido"
+                    placeholder="Apellido"
+                    value={form.apellido}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="telefono"
+                    placeholder="Teléfono (8 dígitos)"
+                    value={form.telefono}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="email"
+                    placeholder="Email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="contrasena"
+                    type="password"
+                    placeholder="Contraseña"
+                    value={form.contrasena}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="confirmar"
+                    type="password"
+                    placeholder="Confirmar contraseña"
+                    value={form.confirmar}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                    name="direccion"
+                    placeholder="Dirección"
+                    value={form.direccion}
+                    onChange={handleChange}
+                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+
+                <button
+                    onClick={handleSubmit}
+                    className="w-full bg-primary text-white py-3 rounded-md hover:bg-primaryDark transition-colors duration-300"
+                >
+                    Registrarse
+                </button>
+
+                <p className="mt-4 text-center text-sm text-muted">
+                    ¿Ya tenés cuenta?
+                    <Link to="/login" className="text-primary hover:underline ml-1">
+                        Iniciá sesión
+                    </Link>
+                </p>
+            </div>
         </div>
     );
+
 };
 
 export default RegisterPage;

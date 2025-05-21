@@ -1,27 +1,57 @@
 import { useEffect, useState } from 'react';
 import axiosInstance from '../../../shared/api/axios';
-import { useAuth } from '../../auth/context/AuthProvider';
 
 const UsersPage = () => {
-    const { logout } = useAuth();
     const [users, setUsers] = useState<any[]>([]);
 
     const fetchUsers = async () => {
-        const res = await axiosInstance.get('/usuarios/');
-        setUsers(res.data);
+        try {
+            const res = await axiosInstance.get('/usuarios/');
+            setUsers(res.data);
+        } catch (err) {
+            console.error('Error al obtener usuarios:', err);
+        }
     };
 
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     return (
         <div>
-            <h1>Usuarios</h1>
-            <ul>
-                {users.map((u, i) => (
-                    <li key={i}>{u.nombre} {u.apellido}</li>
-                ))}
-            </ul>
-            <button onClick={logout}>Cerrar sesión</button>
+            {/* Hero con imagen de fondo y título encima */}
+            <section>
+                <div>
+                    <img src="/banner-mascotas.jpg" alt="Imagen emocional" />
+                    <h1>Mascotas esperando un hogar</h1>
+                </div>
+            </section>
+
+            {/*  Sección principal */}
+            <main>
+                <h2>Mascotas registradas</h2>
+
+                {/*  Tarjetas horizontales */}
+                <div>
+                    {users.length === 0 ? (
+                        <p>No hay mascotas cargadas aún.</p>
+                    ) : (
+                        <ul>
+                            {users.map((u, i) => (
+                                <li key={i}>
+                                    <div>
+                                        <img src={u.imagenUrl || '/placeholder.jpg'} alt={u.nombre} />
+                                        <div>
+                                            <h3>{u.nombre}</h3>
+                                            <button>Editar</button>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </main>
         </div>
     );
 };
