@@ -1,54 +1,54 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../shared/api/axios';
+import TarjetaMascotaResumen from '../../mascotas/components/TarjetaMascotaResumen';
 
 const UsersPage = () => {
-    const [users, setUsers] = useState<any[]>([]);
+    const [mascotas, setMascotas] = useState<any[]>([]);
+    const navigate = useNavigate();
 
-    const fetchUsers = async () => {
+    const fetchMascotas = async () => {
         try {
             const res = await axiosInstance.get('/usuarios/');
-            setUsers(res.data);
+            setMascotas(res.data);
         } catch (err) {
-            console.error('Error al obtener usuarios:', err);
+            console.error('Error al obtener mascotas:', err);
         }
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchMascotas();
     }, []);
 
     return (
-        <div>
-            {/* Hero con imagen de fondo y título encima */}
-            <section>
-                <div>
-                    <img src="/banner-mascotas.jpg" alt="Imagen emocional" />
-                    <h1>Mascotas esperando un hogar</h1>
-                </div>
+        <div className="min-h-screen bg-background p-6 font-sans">
+            {/* Hero */}
+            <section className="relative mb-10">
+                <img
+                    src="/banner-mascotas.jpg"
+                    alt="Mascotas esperando un hogar"
+                    className="w-full h-64 object-cover rounded-xl shadow-md"
+                />
+                <h1 className="absolute top-1/2 left-1/2 text-4xl text-white font-heading drop-shadow-md transform -translate-x-1/2 -translate-y-1/2">
+                    Mascotas esperando un hogar
+                </h1>
             </section>
 
-            {/*  Sección principal */}
+            {/* Mascotas registradas */}
             <main>
-                <h2>Mascotas registradas</h2>
+                <h2 className="text-2xl font-heading text-text mb-6">Mascotas registradas</h2>
 
-                {/*  Tarjetas horizontales */}
-                <div>
-                    {users.length === 0 ? (
-                        <p>No hay mascotas cargadas aún.</p>
+                <div className="space-y-4">
+                    {mascotas.length === 0 ? (
+                        <p className="text-muted">No hay mascotas cargadas aún.</p>
                     ) : (
-                        <ul>
-                            {users.map((u, i) => (
-                                <li key={i}>
-                                    <div>
-                                        <img src={u.imagenUrl || '/placeholder.jpg'} alt={u.nombre} />
-                                        <div>
-                                            <h3>{u.nombre}</h3>
-                                            <button>Editar</button>
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                        mascotas.map((m, i) => (
+                            <TarjetaMascotaResumen
+                                key={i}
+                                mascota={m}
+                                onEditar={() => navigate(`/editar/${m.id}`)}
+                            />
+                        ))
                     )}
                 </div>
             </main>
