@@ -27,6 +27,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -71,6 +73,10 @@ public class Usuario implements UserDetails {
 
 	@NotEmpty
 	private String direccion;
+	
+	@Min(18)
+	@Max(99)
+    private int edad;
 
 	private Double latitud; // generado con OpenCage
 	private Double longitud; // generado con OpenCage

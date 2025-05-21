@@ -18,6 +18,7 @@ public abstract class UsuarioMapper {
 		usuario.setApellido(dto.getApellido());
 		usuario.setTelefono(dto.getTelefono());
 		usuario.setEmail(dto.getEmail());
+		usuario.setEdad(dto.getEdad());
 		usuario.setContrasena(dto.getContrasena());
 		usuario.setConfirmar(dto.getConfirmar());
 		usuario.setDireccion(dto.getDireccion());

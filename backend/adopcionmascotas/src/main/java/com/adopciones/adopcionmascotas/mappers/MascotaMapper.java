@@ -22,22 +22,21 @@ public interface MascotaMapper {
 
 	void actualizarMascotaDesdeDTO(MascotaUpdateDTO dto, @MappingTarget Mascota mascota);
 	
-	// Método auxiliar para convertir Video -> String (url)
-	default String map(Video video) {
-        return video.getUrl();
-    }
+	default String mapVideo(Video video) {
+	    return video.getUrl();
+	}
 
-    default List<String> map(List<Video> videos) {
-        if (videos == null) return List.of(); // Evita el NullPointerException
-        return videos.stream().map(this::map).toList();
-    }
-    // Métodos auxiliares para fotos
-    default String map(Foto foto) {
-        return foto.getUrl();
-    }
+	default List<String> mapVideos(List<Video> videos) {
+	    if (videos == null) return List.of();
+	    return videos.stream().map(this::mapVideo).toList();
+	}
 
-    default List<String> mapFotos(List<Foto> fotos) {
-        if (fotos == null) return List.of(); // Evita el NullPointerException
-        return fotos.stream().map(this::map).toList();
-    }
+	default String mapFoto(Foto foto) {
+	    return foto.getUrl();
+	}
+
+	default List<String> mapFotos(List<Foto> fotos) {
+	    if (fotos == null) return List.of();
+	    return fotos.stream().map(this::mapFoto).toList();
+	}
 }
