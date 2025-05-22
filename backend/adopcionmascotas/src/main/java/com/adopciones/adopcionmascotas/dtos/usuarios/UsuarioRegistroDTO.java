@@ -1,5 +1,7 @@
 package com.adopciones.adopcionmascotas.dtos.usuarios;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -32,8 +34,13 @@ public class UsuarioRegistroDTO {
 
     @NotEmpty(message = "Coloque su dirección")
     private String direccion;
-
+    
+	@NotEmpty(message = "Coloque su distrito")
+	private String distrito;
+    
     private int edad;
+    
+    private MultipartFile imagen;
 
     // Getters y Setters
     public String getNombre() {
@@ -92,11 +99,28 @@ public class UsuarioRegistroDTO {
         this.direccion = direccion;
     }
 
-    public int getEdad() {
+    public String getDistrito() {
+		return distrito;
+	}
+
+	public void setDistrito(String distrito) {
+		this.distrito = distrito;
+	}
+
+	public int getEdad() {
         return edad;
     }
 
     public void setEdad(int edad) {
         this.edad = edad;
     }
+
+	public MultipartFile getImagen() {
+		return imagen;
+	}
+
+	public void setImagen(MultipartFile imagen) {
+		this.imagen = imagen;
+	}
+
 }

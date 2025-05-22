@@ -2,12 +2,15 @@ package com.adopciones.adopcionmascotas.mappers;
 
 import java.util.List;
 
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import com.adopciones.adopcionmascotas.modelos.Usuario;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRegistroDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioUpdateDTO;
+import com.adopciones.adopcionmascotas.modelos.Usuario;
 
 @Mapper(componentModel = "spring")
 public abstract class UsuarioMapper {
@@ -22,6 +25,7 @@ public abstract class UsuarioMapper {
 		usuario.setContrasena(dto.getContrasena());
 		usuario.setConfirmar(dto.getConfirmar());
 		usuario.setDireccion(dto.getDireccion());
+		usuario.setDistrito(dto.getDistrito());
 		usuario.setLatitud(null);
 		usuario.setLongitud(null);
 		usuario.setFotoPerfil(null);

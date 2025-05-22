@@ -1,7 +1,9 @@
 package com.adopciones.adopcionmascotas.controladores;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +25,8 @@ public class AutenticacionControlador {
 	private IUsuarioServicio usuarioServicio;
 
 	// Registrar nuevo usuario
-	@PostMapping("/register")
-	public ResponseEntity<Response> register(@Valid @RequestBody UsuarioRegistroDTO dto) {
+	@PostMapping(value = "/register" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Response> register(@Valid @ModelAttribute  UsuarioRegistroDTO dto) {
 		Response response = usuarioServicio.register(dto);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}

@@ -1,5 +1,7 @@
 package com.adopciones.adopcionmascotas.dtos.usuarios;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.adopciones.adopcionmascotas.modelos.EstadoUsuario;
 
 public class UsuarioRespuestaDTO {
@@ -11,12 +13,13 @@ public class UsuarioRespuestaDTO {
     private String email;
     private EstadoUsuario estado;
     private String direccion;
+    private String distrito;
     private int edad;
     private String fotoPerfil;
     private String ubicacionTexto;
     private Double latitud;
     private Double longitud;
-
+    private String imagen;
     // Getters y Setters
 
     public Long getUsuarioId() {
@@ -75,7 +78,15 @@ public class UsuarioRespuestaDTO {
         this.direccion = direccion;
     }
 
-    public int getEdad() {
+    public String getDistrito() {
+		return distrito;
+	}
+
+	public void setDistrito(String distrito) {
+		this.distrito = distrito;
+	}
+
+	public int getEdad() {
         return edad;
     }
 
@@ -83,15 +94,15 @@ public class UsuarioRespuestaDTO {
         this.edad = edad;
     }
 
-    public String getFotoPerfil() {
-        return fotoPerfil;
-    }
+	public String getFotoPerfil() {
+		return fotoPerfil;
+	}
 
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
-    }
+	public void setFotoPerfil(String fotoPerfil) {
+		this.fotoPerfil = fotoPerfil;
+	}
 
-    public String getUbicacionTexto() {
+	public String getUbicacionTexto() {
         return ubicacionTexto;
     }
 
@@ -114,4 +125,13 @@ public class UsuarioRespuestaDTO {
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
+
+	public String getImagen() {
+		return imagen;
+	}
+
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
+
 }
