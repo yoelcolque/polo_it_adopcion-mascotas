@@ -1,48 +1,60 @@
+import { useEffect, useState } from 'react';
+import axiosInstance from '../../../shared/api/axios';
 import TarjetaMascota from '../../mascotas/components/TarjetaMascota';
-
-
-//aca supuse un posible dato mascota
-const mascotas = [
-    {
-        id: 1,
-        nombre: 'Firu',
-        especie: 'Perro',
-        edad: '2 años',
-        descripcion: 'Leal y activo. Ideal para niños.',
-        imagenUrl: '',
-        contactoUrl: '/perfil/1',
-    },
-    {
-        id: 2,
-        nombre: 'Mishita',
-        especie: 'Gato',
-        edad: '3 años',
-        descripcion: 'Muy cariñosa y tranquila.',
-        imagenUrl: '/img/mishita.png',
-        contactoUrl: '/perfil/2',
-    },
-];
-
-// aca tambien supuse un dato usuario
-const usuario = {
-    nombre: 'Juan Pérez',
-    email: 'juan@example.com',
-    telefono: '12345678',
-    imagenUrl: ''
-};
-
+import { useAuth } from '../../auth/context/AuthProvider';
 
 const PerfilPage = () => {
+    const { accessToken } = useAuth();
+    const [usuario, setUsuario] = useState<any>(null);
+    const [mascotas, setMascotas] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPerfilYmascotas = async () => {
+            if (!accessToken) {
+                return;
+            }
+
+            try {
+                const res = await axiosInstance.get('/usuarios/me');
+                const perfil = res.data?.usuario;
+
+                if (!perfil || !perfil.nombre) {
+                    console.warn('Perfil inválido:', perfil);
+                    return;
+                }
+
+                setUsuario(perfil);
+
+                const mascotasRes = await axiosInstance.get('/mascota/usuario');
+                setMascotas(mascotasRes.data?.mascotas || []);
+            } catch (err) {
+                console.error('Error al cargar perfil o mascotas:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPerfilYmascotas();
+    }, [accessToken]);
+
+    if (loading) {
+        return <p className="p-6 text-muted">Cargando perfil...</p>;
+    }
+
+    if (!usuario) {
+        return <p className="p-6 text-error">No se pudo cargar el perfil del usuario.</p>;
+    }
+
     return (
         <div className="min-h-screen p-6 bg-background font-sans">
             <h1 className="text-3xl font-heading text-text mb-6">Mi perfil</h1>
 
             <div className="grid grid-cols-[150px_1fr_1fr] grid-rows-[auto_auto_auto] gap-4">
-
                 {/* Imagen */}
                 <div className="row-span-2 flex justify-center items-center">
                     <img
-                        src={usuario.imagenUrl || '/placeholder.png'}
+                        src={usuario.fotoPerfil || '/placeholder.png'}
                         alt="Perfil"
                         className="w-28 h-28 rounded-full object-cover border"
                     />
@@ -50,18 +62,33 @@ const PerfilPage = () => {
 
                 {/* Datos */}
                 <div className="col-span-2 flex flex-col gap-2 text-text">
-                    <p><strong>Nombre:</strong> {usuario.nombre}</p>
+                    <p><strong>Nombre:</strong> {usuario.nombre} {usuario.apellido}</p>
                     <p><strong>Email:</strong> {usuario.email}</p>
                     <p><strong>Teléfono:</strong> {usuario.telefono}</p>
                 </div>
 
-                {/* Mascotas asociadas */}
+                {/* Mascotas */}
                 <div className="col-span-3 mt-8">
                     <h2 className="text-2xl font-heading mb-4">Mascotas registradas</h2>
                     <div className="space-y-4">
-                        {mascotas.map(m => (
-                            <TarjetaMascota key={m.id} mascota={m} />
-                        ))}
+                        {mascotas.length === 0 ? (
+                            <p className="text-muted">No hay mascotas asociadas.</p>
+                        ) : (
+                            mascotas.map(m => (
+                                <TarjetaMascota
+                                    key={m.mascotaId}
+                                    mascota={{
+                                        id: m.mascotaId,
+                                        nombre: m.nombre,
+                                        especie: m.especieMascota,
+                                        edad: `${m.edad} años`,
+                                        descripcion: m.temperamento || 'Sin descripción',
+                                        imagenUrl: m.fotos?.[0] || '/placeholder.png',
+                                        contactoUrl: `/perfil/${m.mascotaId}`
+                                    }}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

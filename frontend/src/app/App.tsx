@@ -12,6 +12,11 @@ import PerfilPage from '../features/users/pages/PerfilPage';
 import LayoutWithHeader from './LayoutWithHeader';
 import { useAuth } from '../features/auth/context/AuthProvider';
 import type { ReactNode } from 'react';
+import { DeseosProvider } from '../shared/context/DeseosContext';
+import { MascotasProvider } from '../shared/context/MascotasContext'; // ✅
+import 'leaflet/dist/leaflet.css';
+import { MapaProvider } from '../shared/context/MapaContext';
+
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
     const { accessToken } = useAuth();
@@ -25,8 +30,18 @@ const App = () => (
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Privadas con layout */}
-            <Route element={<LayoutWithHeader />}>
+            {/* Privadas con layout dentro del provider */}
+            <Route
+                element={
+                    <DeseosProvider>
+                        <MascotasProvider>
+                            <MapaProvider>
+                                <LayoutWithHeader />
+                            </MapaProvider>
+                        </MascotasProvider>
+                    </DeseosProvider>
+                }
+            >
                 <Route path="/home" element={<PrivateRoute><UsersPage /></PrivateRoute>} />
                 <Route path="/buscar" element={<PrivateRoute><BuscarMascotaPage /></PrivateRoute>} />
                 <Route path="/deseados" element={<PrivateRoute><DeseadosPage /></PrivateRoute>} />
@@ -35,13 +50,15 @@ const App = () => (
                 <Route path="/perfil" element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
             </Route>
 
-            {/* Puse paginas publicas para ver como era el desarrollo, porque las otras necesitan tokens*/}
-            <Route path="/homes" element={<UsersPage/>} />
-            <Route path="/deseadoss" element={<DeseadosPage/>} />
-            <Route path="/registrars" element={<RegistrarMascotaPage/>} />
-            <Route path="/buscars" element={<BuscarMascotaPage/>} />
-            <Route path="/perfils" element={<PerfilPage/>} />
-            <Route path="/editars/:id" element={<EditarMascotaPage/>}/>
+            {/* Públicas para testing */}
+            <Route element={<LayoutWithHeader />}>
+                <Route path="/homes" element={<UsersPage />} />
+                <Route path="/deseadoss" element={<DeseadosPage />} />
+                <Route path="/registrars" element={<RegistrarMascotaPage />} />
+                <Route path="/buscars" element={<BuscarMascotaPage />} />
+                <Route path="/perfils" element={<PerfilPage />} />
+                <Route path="/editars/:id" element={<EditarMascotaPage />} />
+            </Route>
         </Routes>
     </Router>
 );

@@ -1,24 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../shared/api/axios';
-import TarjetaMascotaResumen from '../../mascotas/components/TarjetaMascotaResumen';
+import TarjetaMascota from '../../mascotas/components/TarjetaMascota';
 
 const UsersPage = () => {
     const [mascotas, setMascotas] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const fetchMascotas = async () => {
-        try {
-            const res = await axiosInstance.get('/usuarios/');
-            setMascotas(res.data);
-        } catch (err) {
-            console.error('Error al obtener mascotas:', err);
-        }
-    };
-
     useEffect(() => {
+        const fetchMascotas = async () => {
+            try {
+                const res = await axiosInstance.get('/mascota'); // sin necesidad de token
+                setMascotas(res.data?.mascotas || []);
+            } catch (err) {
+                console.error('Error al obtener mascotas:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchMascotas();
-    }, []);
+    }, []); // ← sin dependencia de accessToken
+
+
 
     return (
         <div className="min-h-screen bg-background p-6 font-sans">
@@ -38,15 +43,22 @@ const UsersPage = () => {
             <main>
                 <h2 className="text-2xl font-heading text-text mb-6">Mascotas registradas</h2>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {mascotas.length === 0 ? (
                         <p className="text-muted">No hay mascotas cargadas aún.</p>
                     ) : (
-                        mascotas.map((m, i) => (
-                            <TarjetaMascotaResumen
-                                key={i}
-                                mascota={m}
-                                onEditar={() => navigate(`/editar/${m.id}`)}
+                        mascotas.map(m => (
+                            <TarjetaMascota
+                                key={m.mascotaId}
+                                mascota={{
+                                    id: m.mascotaId,
+                                    nombre: m.nombre,
+                                    especie: m.especieMascota,
+                                    edad: `${m.edad} años`,
+                                    descripcion: m.temperamento || 'Sin descripción',
+                                    imagenUrl: m.fotos?.[0] || '/placeholder.png',
+                                    contactoUrl: `/perfil/${m.mascotaId}`
+                                }}
                             />
                         ))
                     )}

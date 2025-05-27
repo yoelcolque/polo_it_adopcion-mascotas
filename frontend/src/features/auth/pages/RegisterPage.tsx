@@ -7,8 +7,10 @@ const RegisterPage = () => {
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
-        nombre: '', apellido: '', telefono: '', email: '', contrasena: '', confirmar: '', direccion: ''
+        nombre: '', apellido: '', telefono: '', email: '',
+        contrasena: '', confirmar: '', direccion: '', fechaNacimiento: ''
     });
+
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -18,16 +20,29 @@ const RegisterPage = () => {
 
     const handleSubmit = async () => {
         const { nombre, apellido, telefono, email, contrasena, confirmar, direccion } = form;
-        if (!nombre || !apellido || !telefono || !email || !contrasena || !confirmar || !direccion) {
+        const edadNum = calcularEdad(form.fechaNacimiento);
+
+        if (isNaN(edadNum) || edadNum < 18) {
+            setError('Debes tener al menos 18 años para registrarte');
+            return;
+        }
+
+        if (!nombre || !apellido || !telefono || !email || !contrasena || !confirmar || !direccion || !form.fechaNacimiento) {
             setError('Completa todos los campos');
             return;
         }
+
         if (contrasena !== confirmar) {
             setError('Las contraseñas no coinciden');
             return;
         }
+        if (!/^\d{8}$/.test(form.telefono)) {
+            setError('El teléfono debe tener exactamente 8 dígitos (sin el 11)');
+            return;
+        }
+
         try {
-            await register(form);
+            await register({ ...form,edad: edadNum.toString() }); // 👈 ESTA ES LA CLAVE
             setSuccess('Usuario registrado con éxito');
             setError('');
             navigate('/login');
@@ -35,6 +50,20 @@ const RegisterPage = () => {
             setError(err.response?.data?.message || 'Registro fallido');
         }
     };
+
+
+    const calcularEdad = (fechaNacimiento: string) => {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        return edad;
+    };
+
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -58,13 +87,28 @@ const RegisterPage = () => {
                     onChange={handleChange}
                     className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
+                <div className="flex items-center mb-4">
+                    <span className="px-3 py-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md text-gray-600 text-sm select-none">
+                        11
+                    </span>
+                    <input
+                        type="text"
+                        name="telefono"
+                        placeholder="8 dígitos restantes"
+                        value={form.telefono}
+                        onChange={handleChange}
+                        maxLength={8}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                </div>
                 <input
-                    name="telefono"
-                    placeholder="Teléfono (8 dígitos)"
-                    value={form.telefono}
+                    name="fechaNacimiento"
+                    type="date"
+                    value={form.fechaNacimiento}
                     onChange={handleChange}
                     className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
+
                 <input
                     name="email"
                     placeholder="Email"

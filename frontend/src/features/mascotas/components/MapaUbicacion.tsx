@@ -1,42 +1,33 @@
-import PuntoUbicacion from './PuntoUbicacion';
+// MapaUbicacion.tsx
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMapa } from '../../../shared/context/MapaContext';
+import { useMascotas } from '../../../shared/context/MascotasContext';
+import 'leaflet/dist/leaflet.css';
 
-const MapaUbicacion = () => (
-    <div className="relative w-full h-96 bg-gray-200 rounded">
+const MapaUbicacion = () => {
+        const { coordenadas } = useMapa();
+        const { mascotas } = useMascotas();
 
-        <PuntoUbicacion
-            top="20%"
-            left="30%"
-            mascota={{
-                nombre: 'Firu',
-                imagenUrl: '',
-                especie: 'Perro',
-                edad: '2 años',
-                descripcion: 'Muy activo y cariñoso',
-            }}
-        />
-        <PuntoUbicacion
-            top="50%"
-            left="60%"
-            mascota={{
-                nombre: 'Mishita',
-                imagenUrl: '/img/mishita.png',
-                especie: 'Gato',
-                edad: '1 año',
-                descripcion: 'Muy tranquila y duerme mucho',
-            }}
-        />
-        <PuntoUbicacion
-            top="70%"
-            left="40%"
-            mascota={{
-                nombre: 'Toby',
-                imagenUrl: '',
-                especie: 'Perro',
-                edad: '4 años',
-                descripcion: 'Fuerte y protector',
-            }}
-        />
-    </div>
-);
+        return (
+            <MapContainer
+                center={[coordenadas.lat, coordenadas.lon]}
+                zoom={13}
+                scrollWheelZoom
+                className="w-full h-[500px] rounded"
+            >
+                    <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {mascotas.map((m: any) => (
+                        <Marker key={m.mascotaId} position={[m.latitud, m.longitud]}>
+                                <Popup>
+                                        <strong>{m.nombre}</strong><br />
+                                        {m.temperamento || 'Sin descripción'}
+                                </Popup>
+                        </Marker>
+                    ))}
+            </MapContainer>
+        );
+};
 
 export default MapaUbicacion;
