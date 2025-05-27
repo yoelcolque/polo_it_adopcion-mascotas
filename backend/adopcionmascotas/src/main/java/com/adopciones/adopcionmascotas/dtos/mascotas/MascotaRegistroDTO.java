@@ -28,7 +28,6 @@ public class MascotaRegistroDTO {
     @NotNull
     private SexoMascota sexoMascota;
 
-    private String imagen;
     private String temperamento;
     private String necesidades;
     private String historialMedico;
@@ -85,14 +84,6 @@ public class MascotaRegistroDTO {
 
     public void setSexoMascota(SexoMascota sexoMascota) {
         this.sexoMascota = sexoMascota;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
     }
 
     public String getTemperamento() {
