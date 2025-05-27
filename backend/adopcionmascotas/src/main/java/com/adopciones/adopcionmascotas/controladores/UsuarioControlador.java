@@ -58,11 +58,13 @@ public class UsuarioControlador {
 	}
 
 	// Obtener datos personales por email
-	@GetMapping("/me/{email}")
-	public ResponseEntity<Response> getMyInfo(@PathVariable String email) {
-		Response response = usuarioServicio.getMyInfo(email);
+// Obtener datos personales del usuario autenticado
+	@GetMapping("/me")
+	public ResponseEntity<Response> getMyInfo(@AuthenticationPrincipal Usuario currentUser) {
+		Response response = usuarioServicio.getMyInfo(currentUser.getEmail());
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
+
 
 	// Modificar datos del usuario
 	@PutMapping("/edit/{usuarioId}")

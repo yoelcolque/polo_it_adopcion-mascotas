@@ -1,6 +1,8 @@
 package com.adopciones.adopcionmascotas.dtos.usuarios;
 
 import com.adopciones.adopcionmascotas.modelos.EstadoUsuario;
+import java.util.List;
+import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
 
 public class UsuarioRespuestaDTO {
 
@@ -8,14 +10,16 @@ public class UsuarioRespuestaDTO {
     private String nombre;
     private String apellido;
     private String telefono;
+
     private String email;
+
     private EstadoUsuario estado;
     private String direccion;
     private int edad;
     private String fotoPerfil;
-    private String ubicacionTexto;
     private Double latitud;
     private Double longitud;
+    private List<MascotaRespuestaDTO> mascotas;
 
     // Getters y Setters
 
@@ -91,14 +95,6 @@ public class UsuarioRespuestaDTO {
         this.fotoPerfil = fotoPerfil;
     }
 
-    public String getUbicacionTexto() {
-        return ubicacionTexto;
-    }
-
-    public void setUbicacionTexto(String ubicacionTexto) {
-        this.ubicacionTexto = ubicacionTexto;
-    }
-
     public Double getLatitud() {
         return latitud;
     }
@@ -113,5 +109,13 @@ public class UsuarioRespuestaDTO {
 
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
+    }
+
+    public List<MascotaRespuestaDTO> getMascotas() {
+        return mascotas;
+    }
+
+    public void setMascotas(List<MascotaRespuestaDTO> mascotas) {
+        this.mascotas = mascotas;
     }
 }

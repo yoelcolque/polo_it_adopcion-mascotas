@@ -9,7 +9,8 @@ type Props = {
 const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
     const [form, setForm] = useState({
         nombre: '',
-        especie: '',
+        especie: '',  // PERRO / GATO
+        sexo: '',     // MACHO / HEMBRA
         edad: '',
         descripcion: '',
         imagen: null as File | null,
@@ -22,16 +23,18 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
         if (mascotaId) {
             axiosInstance.get(`/mascotas/${mascotaId}`)
                 .then(res => {
-                    const { nombre, especie, edad, descripcion } = res.data;
+                    const { nombre, especieMascota, sexoMascota, edad, descripcion } = res.data;
                     setForm(prev => ({
                         ...prev,
                         nombre,
-                        especie,
-                        edad,
+                        especie: especieMascota,
+                        sexo: sexoMascota,
+                        edad: edad.toString(),
                         descripcion,
-                        imagen: null, // no previsualizamos imagen del servidor por seguridad
+                        imagen: null,
                     }));
                 })
+
                 .catch(err => {
                     console.error('Error al cargar la mascota:', err);
                     alert('Error al obtener datos de la mascota.');
@@ -49,23 +52,27 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
         setForm(prev => ({ ...prev, imagen: file }));
     };
 
+
     // Subida condicional: POST o PUT + redirección
     const handleSubmit = async () => {
         try {
-            const data = new FormData();
-            data.append('nombre', form.nombre);
-            data.append('especie', form.especie);
-            data.append('edad', form.edad);
-            data.append('descripcion', form.descripcion);
-            if (form.imagen) data.append('imagen', form.imagen);
+            const mascotaDTO = {
+                nombre: form.nombre,
+                edad: parseInt(form.edad),
+                especieMascota: form.especie.toUpperCase(),
+                sexoMascota: form.sexo.toUpperCase(),
+                descripcion: form.descripcion,
+                // Omitimos imagen porque el backend no la espera aún
+            };
+
 
             if (mascotaId) {
-                await axiosInstance.put(`/mascotas/${mascotaId}`, data);
-                alert('Mascota actualizada con éxito.');
+                await axiosInstance.put(`/mascota/editar/${mascotaId}`, mascotaDTO);
             } else {
-                await axiosInstance.post('/mascotas', data);
-                alert('Mascota registrada con éxito.');
+                await axiosInstance.post('/mascota/agregar', mascotaDTO);
             }
+
+
 
             navigate('/home');
         } catch (error) {
@@ -76,7 +83,7 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
 
     return (
         <div className="flex gap-4 bg-surface p-6 rounded-xl shadow-md">
-            {/* Imagen */}
+            {/* Imagen (visual, no funcional aún) */}
             <div className="w-32 h-32 flex justify-center items-center border rounded-full overflow-hidden bg-muted text-white text-sm">
                 {form.imagen ? (
                     <img
@@ -104,23 +111,42 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
 
                 <div>
                     <label className="block text-sm text-muted mb-1">Especie</label>
-                    <input
-                        type="text"
+                    <select
                         name="especie"
                         value={form.especie}
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
-                    />
+                    >
+                        <option value="">Seleccioná especie</option>
+                        <option value="PERRO">Perro</option>
+                        <option value="GATO">Gato</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm text-muted mb-1">Sexo</label>
+                    <select
+                        name="sexo"
+                        value={form.sexo}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    >
+                        <option value="">Seleccioná sexo</option>
+                        <option value="MACHO">Macho</option>
+                        <option value="HEMBRA">Hembra</option>
+                    </select>
                 </div>
 
                 <div>
                     <label className="block text-sm text-muted mb-1">Edad</label>
                     <input
-                        type="text"
+                        type="number"
                         name="edad"
                         value={form.edad}
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
+                        min={0}
+                        max={25}
                     />
                 </div>
 
@@ -134,10 +160,14 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                         className="w-full p-2 border rounded"
                     />
                 </div>
-
                 <div>
                     <label className="block text-sm text-muted mb-1">Imagen</label>
-                    <input type="file" onChange={handleFileChange} className="w-full" />
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        className="w-full"
+                        accept="image/*"
+                    />
                 </div>
 
                 <button
@@ -149,6 +179,7 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
             </div>
         </div>
     );
+
 };
 
 export default TarjetaMascotaRegistrar;

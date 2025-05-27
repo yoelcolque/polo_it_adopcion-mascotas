@@ -1,35 +1,54 @@
-import TarjetaMascota from '../components/TarjetaMascota.tsx';
+import { useEffect, useState } from 'react';
+import TarjetaMascota from '../components/TarjetaMascota';
+import axiosInstance from '../../../shared/api/axios';
+import { useAuth } from '../../auth/context/AuthProvider';
 
-const mascotasDeseadas = [
-    {
-        id: 1,
-        nombre: 'Firu',
-        especie: 'Perro',
-        edad: '2 años',
-        descripcion: 'Un cachorro juguetón que ama correr y abrazar.',
-        imagenUrl: '', // vacío para simular sin imagen
-        contactoUrl: '/perfil/1',
-    },
-    {
-        id: 2,
-        nombre: 'Mishita',
-        especie: 'Gato',
-        edad: '1 año',
-        descripcion: 'Muy tranquila y ama dormir cerca de la ventana.',
-        imagenUrl: '/img/mishita.png',
-        contactoUrl: '/perfil/2',
-    }
-];
+const DeseadosPage = () => {
+    const { accessToken } = useAuth();
+    const [mascotas, setMascotas] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-const DeseadosPage = () => (
-    <div className="p-6 bg-background min-h-screen font-sans">
-        <h1 className="text-3xl font-heading text-text mb-8">Mascotas deseadas</h1>
-        <div className="space-y-6">
-            {mascotasDeseadas.map(m => (
-                <TarjetaMascota key={m.id} mascota={m} />
-            ))}
+    useEffect(() => {
+        if (!accessToken) return;
+
+        axiosInstance.get('/deseados')
+            .then(res => {
+                setMascotas(res.data?.mascotas || []);
+            })
+            .catch(err => {
+                console.error("Error al obtener mascotas deseadas:", err);
+            })
+            .finally(() => setLoading(false));
+    }, [accessToken]);
+
+    return (
+        <div className="p-6 bg-background min-h-screen font-sans">
+            <h1 className="text-3xl font-heading text-text mb-8">Mascotas deseadas</h1>
+
+            {loading ? (
+                <p className="text-muted">Cargando...</p>
+            ) : mascotas.length === 0 ? (
+                <p className="text-muted">Aún no has marcado ninguna mascota como deseada.</p>
+            ) : (
+                <div className="space-y-6">
+                    {mascotas.map(m => (
+                        <TarjetaMascota
+                            key={m.mascotaId}
+                            mascota={{
+                                id: m.mascotaId,
+                                nombre: m.nombre,
+                                especie: m.especieMascota,
+                                edad: `${m.edad} años`,
+                                descripcion: m.temperamento || 'Sin descripción disponible',
+                                imagenUrl: m.fotos?.[0] || '/placeholder.png',
+                                contactoUrl: `/perfil/${m.mascotaId}`
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
-    </div>
-);
+    );
+};
 
 export default DeseadosPage;

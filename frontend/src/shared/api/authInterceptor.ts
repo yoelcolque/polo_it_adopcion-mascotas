@@ -1,4 +1,3 @@
-// src/shared/api/authInterceptor.ts
 import axiosInstance from './axios';
 
 let isRefreshing = false;
