@@ -2,15 +2,18 @@ package com.adopciones.adopcionmascotas.mappers;
 
 import java.util.List;
 
-import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.adopciones.adopcionmascotas.modelos.Usuario;
+import com.adopciones.adopcionmascotas.modelos.Mascota;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRegistroDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioUpdateDTO;
+import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
 
-@Mapper(componentModel = "spring")
-public abstract class UsuarioMapper {
+@Component
+public class UsuarioMapper {
 
 	public Usuario usuarioRegistroDTOtoUsuario(UsuarioRegistroDTO dto) {
 		Usuario usuario = new Usuario();
@@ -31,10 +34,37 @@ public abstract class UsuarioMapper {
 		return usuario;
 	}
 
-	public abstract UsuarioRespuestaDTO usuarioToUsuarioRespuestaDTO(Usuario usuario);
+	public UsuarioRespuestaDTO usuarioToUsuarioRespuestaDTO(Usuario usuario) {
+		if (usuario == null) return null;
 
-	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-	public abstract void actualizarUsuarioDesdeDTO(UsuarioUpdateDTO dto, @MappingTarget Usuario usuario);
+		UsuarioRespuestaDTO dto = new UsuarioRespuestaDTO();
+		dto.setUsuarioId(usuario.getUsuarioId());
+		dto.setNombre(usuario.getNombre());
+		dto.setApellido(usuario.getApellido());
+		dto.setTelefono(usuario.getTelefono());
+		dto.setEmail(usuario.getEmail());
+		dto.setEstado(usuario.getEstado());
+		dto.setDireccion(usuario.getDireccion());
+		dto.setEdad(usuario.getEdad());
+		dto.setFotoPerfil(usuario.getFotoPerfil());
+		//dto.setUbicacionTexto(usuario.getUbicacionTexto());
+		dto.setLatitud(usuario.getLatitud());
+		dto.setLongitud(usuario.getLongitud());
 
-	public abstract List<UsuarioRespuestaDTO> usuariosToUsuarioRespuestaDTOs(List<Usuario> usuarios);
-}	
+		return dto;
+	}
+
+	public void actualizarUsuarioDesdeDTO(UsuarioUpdateDTO dto, Usuario usuario) {
+		if (dto.getNombre() != null) usuario.setNombre(dto.getNombre());
+		if (dto.getApellido() != null) usuario.setApellido(dto.getApellido());
+		if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
+		if (dto.getDireccion() != null) usuario.setDireccion(dto.getDireccion());
+		if (dto.getEdad() != 0) usuario.setEdad(dto.getEdad());
+	}
+
+	public List<UsuarioRespuestaDTO> usuariosToUsuarioRespuestaDTOs(List<Usuario> usuarios) {
+		return usuarios.stream()
+				.map(this::usuarioToUsuarioRespuestaDTO)
+				.toList();
+	}
+}
