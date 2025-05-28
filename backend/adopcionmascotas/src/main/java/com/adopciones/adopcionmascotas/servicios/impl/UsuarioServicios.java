@@ -1,6 +1,7 @@
 package com.adopciones.adopcionmascotas.servicios.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,38 +44,62 @@ public class UsuarioServicios implements IUsuarioServicio {
 	@Autowired
 	private UsuarioMapper usuarioMapper;
 
+	@Autowired
+	private GeocodingService geocodingService;
+	
+	@Autowired
+	private CloudinaryServicio cloudinaryService;
+	
 	@Override
 	public Response register(UsuarioRegistroDTO dto) {
-		Response response = new Response();
-		try {
-			usuarioRepositorio.findByEmail(dto.getEmail()).ifPresent(u -> {
-				throw new OurException("Ya existe un usuario con ese email");
-			});
+	    Response response = new Response();
+	    try {
+	        // Validar si ya existe usuario con email
+	        if (usuarioRepositorio.findByEmail(dto.getEmail()).isPresent()) {
+	            throw new OurException("Ya existe un usuario con ese email");
+	        }
 
-			if (!dto.getContrasena().equals(dto.getConfirmar())) {
-				throw new OurException("La contraseña y su confirmación no coinciden");
-			}
+	        // Validar contraseña y confirmación
+	        if (!dto.getContrasena().equals(dto.getConfirmar())) {
+	            throw new OurException("La contraseña y su confirmación no coinciden");
+	        }
+	        
+	        String urlImagen = null;
+	        if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
+	            urlImagen = cloudinaryService.subirImagen(dto.getImagen());
+	        }
 
-			Usuario usuario = usuarioMapper.usuarioRegistroDTOtoUsuario(dto);
-			usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
-			usuario.setEstado(EstadoUsuario.ACTIVO);
+	        Usuario usuario = usuarioMapper.usuarioRegistroDTOtoUsuario(dto);
+	        usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
+	        usuario.setEstado(EstadoUsuario.ACTIVO);
+	        if (urlImagen != null) {
+	            usuario.setFotoPerfil(urlImagen);;
+	        }
 
-			Usuario guardado = usuarioRepositorio.save(usuario);
-			UsuarioRespuestaDTO respuestaDTO = usuarioMapper.usuarioToUsuarioRespuestaDTO(guardado);
+	        // Obtener latitud y longitud
+	        Optional<double[]> latLng = geocodingService.obtenerLatLng(dto.getDireccion());
+	        latLng.ifPresent(coords -> {
+	            usuario.setLatitud(coords[0]);
+	            usuario.setLongitud(coords[1]);
+	        });
 
-			response.setStatusCode(200);
-			response.setUsuario(respuestaDTO);
+	        Usuario guardado = usuarioRepositorio.save(usuario);
+	        UsuarioRespuestaDTO respuestaDTO = usuarioMapper.usuarioToUsuarioRespuestaDTO(guardado);
 
-		} catch (OurException e) {
-			response.setStatusCode(400);
-			response.setMessage(e.getMessage());
-		} catch (Exception e) {
-			response.setStatusCode(500);
-			response.setMessage("Ocurrió un error al registrarse: " + e.getMessage());
-		}
+	        response.setStatusCode(200);
+	        response.setUsuario(respuestaDTO);
 
-		return response;
+	    } catch (OurException e) {
+	        response.setStatusCode(400);
+	        response.setMessage(e.getMessage());
+	    } catch (Exception e) {
+	        response.setStatusCode(500);
+	        response.setMessage("Ocurrió un error al registrarse: " + e.getMessage());
+	    }
+
+	    return response;
 	}
+
 
 
 	@Override

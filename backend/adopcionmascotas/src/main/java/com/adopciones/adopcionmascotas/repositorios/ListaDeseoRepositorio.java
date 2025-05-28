@@ -13,4 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ListaDeseoRepositorio extends JpaRepository<ListaDeseo, ListaDeseoId> {
     List<ListaDeseo> findByUsuario(Usuario usuario);
     Optional<ListaDeseo> findByUsuarioAndMascota(Usuario usuario, Mascota mascota);
+
 }

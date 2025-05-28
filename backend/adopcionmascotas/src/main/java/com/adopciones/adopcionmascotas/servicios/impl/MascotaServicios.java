@@ -222,5 +222,4 @@ public class MascotaServicios implements IMascotaServicio {
 		}
 		return response;
 	}
-
 }

@@ -1,11 +1,13 @@
 package com.adopciones.adopcionmascotas.repositorios;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.adopciones.adopcionmascotas.modelos.Mascota;
-import com.adopciones.adopcionmascotas.modelos.Usuario;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.adopciones.adopcionmascotas.modelos.Mascota;
+import com.adopciones.adopcionmascotas.modelos.Usuario;
 
 
 public interface MascotaRepositorio extends JpaRepository<Mascota, Long> {
@@ -33,6 +35,4 @@ public interface MascotaRepositorio extends JpaRepository<Mascota, Long> {
             @Param("lon") double lon,
             @Param("distanciaKm") double distanciaKm
     );
-
 }
-

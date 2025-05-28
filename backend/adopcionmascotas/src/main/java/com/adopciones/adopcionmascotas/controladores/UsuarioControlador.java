@@ -58,7 +58,7 @@ public class UsuarioControlador {
 	}
 
 	// Obtener datos personales por email
-// Obtener datos personales del usuario autenticado
+	// Obtener datos personales del usuario autenticado
 	@GetMapping("/me")
 	public ResponseEntity<Response> getMyInfo(@AuthenticationPrincipal Usuario currentUser) {
 		Response response = usuarioServicio.getMyInfo(currentUser.getEmail());

@@ -2,15 +2,13 @@ package com.adopciones.adopcionmascotas.mappers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.adopciones.adopcionmascotas.modelos.Usuario;
-import com.adopciones.adopcionmascotas.modelos.Mascota;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRegistroDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioUpdateDTO;
-import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
+import com.adopciones.adopcionmascotas.modelos.Usuario;
+
 
 @Component
 public class UsuarioMapper {
@@ -68,3 +66,4 @@ public class UsuarioMapper {
 				.toList();
 	}
 }
+

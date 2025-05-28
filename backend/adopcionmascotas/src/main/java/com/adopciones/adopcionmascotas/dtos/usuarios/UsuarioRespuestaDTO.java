@@ -1,8 +1,9 @@
 package com.adopciones.adopcionmascotas.dtos.usuarios;
 
-import com.adopciones.adopcionmascotas.modelos.EstadoUsuario;
 import java.util.List;
+
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
+import com.adopciones.adopcionmascotas.modelos.EstadoUsuario;
 
 public class UsuarioRespuestaDTO {
 
@@ -10,16 +11,19 @@ public class UsuarioRespuestaDTO {
     private String nombre;
     private String apellido;
     private String telefono;
-
+    
     private String email;
-
     private EstadoUsuario estado;
     private String direccion;
+    private String distrito;
     private int edad;
     private String fotoPerfil;
+    
+    
     private Double latitud;
     private Double longitud;
-    private List<MascotaRespuestaDTO> mascotas;
+    private String imagen;
+    private List<MascotaRespuestaDTO> mascotas;	
 
     // Getters y Setters
 
@@ -79,7 +83,15 @@ public class UsuarioRespuestaDTO {
         this.direccion = direccion;
     }
 
-    public int getEdad() {
+    public String getDistrito() {
+		return distrito;
+	}
+
+	public void setDistrito(String distrito) {
+		this.distrito = distrito;
+	}
+
+	public int getEdad() {
         return edad;
     }
 
@@ -87,15 +99,23 @@ public class UsuarioRespuestaDTO {
         this.edad = edad;
     }
 
-    public String getFotoPerfil() {
-        return fotoPerfil;
-    }
+	public String getFotoPerfil() {
+		return fotoPerfil;
+	}
 
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
-    }
+	public void setFotoPerfil(String fotoPerfil) {
+		this.fotoPerfil = fotoPerfil;
+	}
 
-    public Double getLatitud() {
+    public List<MascotaRespuestaDTO> getMascotas() {
+		return mascotas;
+	}
+
+	public void setMascotas(List<MascotaRespuestaDTO> mascotas) {
+		this.mascotas = mascotas;
+	}
+
+	public Double getLatitud() {
         return latitud;
     }
 
@@ -111,11 +131,11 @@ public class UsuarioRespuestaDTO {
         this.longitud = longitud;
     }
 
-    public List<MascotaRespuestaDTO> getMascotas() {
-        return mascotas;
-    }
+	public String getImagen() {
+		return imagen;
+	}
 
-    public void setMascotas(List<MascotaRespuestaDTO> mascotas) {
-        this.mascotas = mascotas;
-    }
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
 }

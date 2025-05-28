@@ -74,6 +74,9 @@ public class Usuario implements UserDetails {
 	@NotEmpty
 	private String direccion;
 	
+	@NotEmpty	
+	private String distrito;
+	
 	@Min(18)
 	@Max(99)
     private int edad;

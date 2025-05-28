@@ -2,6 +2,8 @@ package com.adopciones.adopcionmascotas.dtos.mascotas;
 
 import java.math.BigDecimal;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.adopciones.adopcionmascotas.modelos.EspecieMascota;
 import com.adopciones.adopcionmascotas.modelos.SexoMascota;
 
@@ -13,6 +15,8 @@ public class MascotaUpdateDTO {
     private String pelaje;
     private EspecieMascota especieMascota;
     private SexoMascota sexoMascota;
+
+    private MultipartFile imagen;
     private String temperamento;
     private String necesidades;
     private String historialMedico;
@@ -72,7 +76,15 @@ public class MascotaUpdateDTO {
         this.sexoMascota = sexoMascota;
     }
 
-    public String getTemperamento() {
+    public MultipartFile getImagen() {
+		return imagen;
+	}
+
+	public void setImagen(MultipartFile imagen) {
+		this.imagen = imagen;
+	}
+
+	public String getTemperamento() {
         return temperamento;
     }
 

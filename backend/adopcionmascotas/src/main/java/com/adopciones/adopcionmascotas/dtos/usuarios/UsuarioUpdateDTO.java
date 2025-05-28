@@ -9,6 +9,7 @@ public class UsuarioUpdateDTO {
     private String telefono;
     private EstadoUsuario estado;
     private String direccion;
+    private String distrito;
     private int edad;
 
     // Getters y Setters
@@ -53,7 +54,15 @@ public class UsuarioUpdateDTO {
         this.direccion = direccion;
     }
 
-    public int getEdad() {
+    public String getDistrito() {
+		return distrito;
+	}
+
+	public void setDistrito(String distrito) {
+		this.distrito = distrito;
+	}
+
+	public int getEdad() {
         return edad;
     }
 
