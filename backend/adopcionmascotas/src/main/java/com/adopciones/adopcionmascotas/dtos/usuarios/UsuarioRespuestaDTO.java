@@ -1,7 +1,8 @@
 package com.adopciones.adopcionmascotas.dtos.usuarios;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
+import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
 import com.adopciones.adopcionmascotas.modelos.EstadoUsuario;
 
 public class UsuarioRespuestaDTO {
@@ -10,16 +11,21 @@ public class UsuarioRespuestaDTO {
     private String nombre;
     private String apellido;
     private String telefono;
+    
     private String email;
+    
     private EstadoUsuario estado;
     private String direccion;
     private String distrito;
     private int edad;
     private String fotoPerfil;
-    private String ubicacionTexto;
+    
+    
     private Double latitud;
     private Double longitud;
     private String imagen;
+    private List<MascotaRespuestaDTO> mascotas;	
+    
     // Getters y Setters
 
     public Long getUsuarioId() {
@@ -102,15 +108,15 @@ public class UsuarioRespuestaDTO {
 		this.fotoPerfil = fotoPerfil;
 	}
 
-	public String getUbicacionTexto() {
-        return ubicacionTexto;
-    }
+    public List<MascotaRespuestaDTO> getMascotas() {
+		return mascotas;
+	}
 
-    public void setUbicacionTexto(String ubicacionTexto) {
-        this.ubicacionTexto = ubicacionTexto;
-    }
+	public void setMascotas(List<MascotaRespuestaDTO> mascotas) {
+		this.mascotas = mascotas;
+	}
 
-    public Double getLatitud() {
+	public Double getLatitud() {
         return latitud;
     }
 

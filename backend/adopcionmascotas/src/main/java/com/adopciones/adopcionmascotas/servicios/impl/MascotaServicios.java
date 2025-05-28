@@ -40,7 +40,17 @@ public class MascotaServicios implements IMascotaServicio {
 			mascota.setUsuario(currentUser);
 
 			Mascota savedMascota = mascotaRepositorio.save(mascota);
-			MascotaRespuestaDTO mascotaRespuestaDTO = mascotaMapper.mascotaToMascotaRespuestaDTO(savedMascota);
+
+			MascotaRespuestaDTO mascotaRespuestaDTO;
+			try {
+				mascotaRespuestaDTO = mascotaMapper.mascotaToMascotaRespuestaDTO(savedMascota);
+			} catch (Exception e) {
+				System.err.println(" Error al mapear mascota a DTO: " + e.getMessage());
+				e.printStackTrace();
+				response.setStatusCode(500);
+				response.setMessage("Error interno al convertir la mascota.");
+				return response;
+			}
 
 			response.setStatusCode(200);
 			response.setMessage("Mascota añadida exitosamente");
@@ -169,6 +179,45 @@ public class MascotaServicios implements IMascotaServicio {
 		} catch (Exception e) {
 			response.setStatusCode(500);
 			response.setMessage("Error al actualizar la mascota: " + e.getMessage());
+		}
+		return response;
+	}
+	
+	public Response getPetsByUsuario(Usuario currentUser) {
+		Response response = new Response();
+		try {
+			if (currentUser == null) {
+				throw new OurException("Usuario no autenticado.");
+			}
+
+			List<Mascota> mascotas = mascotaRepositorio.findByUsuario(currentUser);
+			List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
+
+			response.setStatusCode(200);
+			response.setMessage("Mascotas del usuario obtenidas correctamente");
+			response.setMascotas(mascotasDTO);
+		} catch (OurException e) {
+			response.setStatusCode(401);
+			response.setMessage(e.getMessage());
+		} catch (Exception e) {
+			response.setStatusCode(500);
+			response.setMessage("Error al obtener las mascotas del usuario: " + e.getMessage());
+		}
+		return response;
+	}
+
+	public Response getMascotasCercanas(double lat, double lon, double distanciaKm) {
+		Response response = new Response();
+		try {
+			List<Mascota> mascotas = mascotaRepositorio.findCercanas(lat, lon, distanciaKm);
+			List<MascotaRespuestaDTO> dtos = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
+
+			response.setStatusCode(200);
+			response.setMessage("Mascotas cercanas encontradas");
+			response.setMascotas(dtos);
+		} catch (Exception e) {
+			response.setStatusCode(500);
+			response.setMessage("Error al obtener mascotas cercanas: " + e.getMessage());
 		}
 		return response;
 	}
