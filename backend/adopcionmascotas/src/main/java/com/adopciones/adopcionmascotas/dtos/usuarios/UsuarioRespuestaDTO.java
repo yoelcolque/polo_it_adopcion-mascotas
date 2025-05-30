@@ -14,7 +14,7 @@ public class UsuarioRespuestaDTO {
     
     private String email;
     private EstadoUsuario estado;
-    private String direccion;
+    private String calle;
     private String distrito;
     private int edad;
     private String fotoPerfil;
@@ -22,7 +22,6 @@ public class UsuarioRespuestaDTO {
     
     private Double latitud;
     private Double longitud;
-    private String imagen;
     private List<MascotaRespuestaDTO> mascotas;	
 
     // Getters y Setters
@@ -75,15 +74,15 @@ public class UsuarioRespuestaDTO {
         this.estado = estado;
     }
 
-    public String getDireccion() {
-        return direccion;
-    }
+    public String getCalle() {
+		return calle;
+	}
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+	public void setCalle(String calle) {
+		this.calle = calle;
+	}
 
-    public String getDistrito() {
+	public String getDistrito() {
 		return distrito;
 	}
 
@@ -130,12 +129,4 @@ public class UsuarioRespuestaDTO {
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
-
-	public String getImagen() {
-		return imagen;
-	}
-
-	public void setImagen(String imagen) {
-		this.imagen = imagen;
-	}
 }

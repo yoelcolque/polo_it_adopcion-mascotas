@@ -8,15 +8,10 @@ import org.springframework.stereotype.Component;
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRegistroDTO;
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaUpdateDTO;
-import com.adopciones.adopcionmascotas.modelos.Foto;
 import com.adopciones.adopcionmascotas.modelos.Mascota;
-import com.adopciones.adopcionmascotas.modelos.Video;
 
 @Component
 public class MascotaMapper {
-
-	@Autowired
-	private UsuarioMapper usuarioMapper;
 
 	public Mascota mascotaRegistroDTOToMascota(MascotaRegistroDTO dto) {
 		try {
@@ -64,34 +59,6 @@ public class MascotaMapper {
 		dto.setUbicacionTexto(mascota.getUbicacionTexto());
 		dto.setLatitud(mascota.getLatitud());
 		dto.setLongitud(mascota.getLongitud());
-
-		if (mascota.getUsuario() != null) {
-			dto.setUsuario(usuarioMapper.usuarioToUsuarioRespuestaDTO(mascota.getUsuario()));
-		}
-
-		if (mascota.getFotos() != null && !mascota.getFotos().isEmpty()) {
-			List<String> fotos = mascota.getFotos().stream()
-					.filter(f -> f != null && f.getUrl() != null)
-					.map(Foto::getUrl)
-					.toList();
-			dto.setFotos(fotos);
-			dto.setImagen(fotos.isEmpty() ? null : fotos.get(0));
-		} else {
-			dto.setFotos(List.of());
-			dto.setImagen(null);
-		}
-
-
-		if (mascota.getVideos() != null && !mascota.getVideos().isEmpty()) {
-			List<String> videos = mascota.getVideos().stream()
-					.filter(v -> v != null && v.getUrl() != null)
-					.map(Video::getUrl)
-					.toList();
-			dto.setVideos(videos);
-		} else {
-			dto.setVideos(List.of());
-		}
-
 
 		return dto;
 	}

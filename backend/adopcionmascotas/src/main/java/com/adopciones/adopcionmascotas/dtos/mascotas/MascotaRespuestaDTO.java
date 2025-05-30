@@ -1,7 +1,6 @@
 package com.adopciones.adopcionmascotas.dtos.mascotas;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
 import com.adopciones.adopcionmascotas.modelos.EspecieMascota;
@@ -28,8 +27,6 @@ public class MascotaRespuestaDTO {
     private Double latitud;
     private Double longitud;
     private UsuarioRespuestaDTO usuario;
-    private List<String> fotos;
-    private List<String> videos;
 
     // Getters y Setters
 
@@ -175,21 +172,5 @@ public class MascotaRespuestaDTO {
 
     public void setUsuario(UsuarioRespuestaDTO usuario) {
         this.usuario = usuario;
-    }
-
-    public List<String> getFotos() {
-        return fotos;
-    }
-
-    public void setFotos(List<String> fotos) {
-        this.fotos = fotos;
-    }
-
-    public List<String> getVideos() {
-        return videos;
-    }
-
-    public void setVideos(List<String> videos) {
-        this.videos = videos;
     }
 }

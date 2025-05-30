@@ -32,8 +32,8 @@ public class UsuarioRegistroDTO {
     @Size(min = 6, message = "La confirmación necesita al menos 6 caracteres.")
     private String confirmar;
 
-    @NotEmpty(message = "Coloque su dirección")
-    private String direccion;
+    @NotEmpty(message = "Coloque el nombre de la calle (sin altura)")
+    private String calle; 
     
 	@NotEmpty(message = "Coloque su distrito")
 	private String distrito;
@@ -91,15 +91,15 @@ public class UsuarioRegistroDTO {
         this.confirmar = confirmar;
     }
 
-    public String getDireccion() {
-        return direccion;
-    }
+    public String getCalle() {
+		return calle;
+	}
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+	public void setCalle(String calle) {
+		this.calle = calle;
+	}
 
-    public String getDistrito() {
+	public String getDistrito() {
 		return distrito;
 	}
 

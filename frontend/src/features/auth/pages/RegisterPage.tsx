@@ -8,27 +8,42 @@ const RegisterPage = () => {
 
     const [form, setForm] = useState({
         nombre: '', apellido: '', telefono: '', email: '',
-        contrasena: '', confirmar: '', direccion: '', fechaNacimiento: ''
+        contrasena: '', confirmar: '', calle: '', fechaNacimiento: '',
+        distrito: '', imagen: null as File | null,
     });
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, files } = e.target;
+        if (name === 'imagen' && files) {
+            setForm(prev => ({ ...prev, imagen: files[0] }));
+        } else {
+            setForm(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const calcularEdad = (fechaNacimiento: string) => {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+        return edad;
     };
 
     const handleSubmit = async () => {
-        const { nombre, apellido, telefono, email, contrasena, confirmar, direccion } = form;
-        const edadNum = calcularEdad(form.fechaNacimiento);
+        const { nombre, apellido, telefono, email, contrasena, confirmar, calle, distrito, imagen, fechaNacimiento } = form;
+        const edadNum = calcularEdad(fechaNacimiento);
 
         if (isNaN(edadNum) || edadNum < 18) {
             setError('Debes tener al menos 18 años para registrarte');
             return;
         }
 
-        if (!nombre || !apellido || !telefono || !email || !contrasena || !confirmar || !direccion || !form.fechaNacimiento) {
-            setError('Completa todos los campos');
+        if (!nombre || !apellido || !telefono || !email || !contrasena || !confirmar || !calle || !fechaNacimiento || !distrito || !imagen) {
+            setError('Completa todos los campos, incluyendo calle, distrito e imagen');
             return;
         }
 
@@ -36,13 +51,14 @@ const RegisterPage = () => {
             setError('Las contraseñas no coinciden');
             return;
         }
-        if (!/^\d{8}$/.test(form.telefono)) {
+
+        if (!/^\d{8}$/.test(telefono)) {
             setError('El teléfono debe tener exactamente 8 dígitos (sin el 11)');
             return;
         }
 
         try {
-            await register({ ...form,edad: edadNum.toString() }); // 👈 ESTA ES LA CLAVE
+            await register({ ...form, edad: edadNum } as any);
             setSuccess('Usuario registrado con éxito');
             setError('');
             navigate('/login');
@@ -50,20 +66,6 @@ const RegisterPage = () => {
             setError(err.response?.data?.message || 'Registro fallido');
         }
     };
-
-
-    const calcularEdad = (fechaNacimiento: string) => {
-        const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const mes = hoy.getMonth() - nacimiento.getMonth();
-
-        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-        }
-        return edad;
-    };
-
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -73,24 +75,20 @@ const RegisterPage = () => {
                 {error && <div className="text-error text-center mb-4">{error}</div>}
                 {success && <div className="text-green-600 text-center mb-4">{success}</div>}
 
-                <input
-                    name="nombre"
-                    placeholder="Nombre"
-                    value={form.nombre}
-                    onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                    name="apellido"
-                    placeholder="Apellido"
-                    value={form.apellido}
-                    onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                {['nombre', 'apellido', 'email', 'contrasena', 'confirmar', 'calle', 'distrito'].map(field => (
+                    <input
+                        key={field}
+                        name={field}
+                        type={(field === 'contrasena' || field === 'confirmar') ? 'password' : 'text'}
+                        placeholder={field[0].toUpperCase() + field.slice(1)}
+                        value={(form as any)[field]}
+                        onChange={handleChange}
+                        className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                ))}
+
                 <div className="flex items-center mb-4">
-                    <span className="px-3 py-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md text-gray-600 text-sm select-none">
-                        11
-                    </span>
+                    <span className="px-3 py-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md text-gray-600 text-sm select-none">11</span>
                     <input
                         type="text"
                         name="telefono"
@@ -101,6 +99,7 @@ const RegisterPage = () => {
                         className="w-full px-4 py-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                 </div>
+
                 <input
                     name="fechaNacimiento"
                     type="date"
@@ -110,34 +109,11 @@ const RegisterPage = () => {
                 />
 
                 <input
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
+                    type="file"
+                    name="imagen"
+                    accept="image/*"
                     onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                    name="contrasena"
-                    type="password"
-                    placeholder="Contraseña"
-                    value={form.contrasena}
-                    onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                    name="confirmar"
-                    type="password"
-                    placeholder="Confirmar contraseña"
-                    value={form.confirmar}
-                    onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                    name="direccion"
-                    placeholder="Dirección"
-                    value={form.direccion}
-                    onChange={handleChange}
-                    className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full mb-4"
                 />
 
                 <button
@@ -156,7 +132,6 @@ const RegisterPage = () => {
             </div>
         </div>
     );
-
 };
 
 export default RegisterPage;

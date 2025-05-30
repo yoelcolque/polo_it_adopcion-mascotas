@@ -9,7 +9,7 @@ public interface IMascotaServicio {
 
 	Response createPet(MascotaRegistroDTO mascotaDTO, Usuario currentUser);
 
-	Response getAllPets();
+	Response getAllPets(Usuario currentUser);
 
 	Response deletePet(Long mascotaId, Usuario currentUser);
 

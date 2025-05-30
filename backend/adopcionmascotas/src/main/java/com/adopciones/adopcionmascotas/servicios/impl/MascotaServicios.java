@@ -3,6 +3,7 @@ package com.adopciones.adopcionmascotas.servicios.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import com.adopciones.adopcionmascotas.dtos.Response;
@@ -69,20 +70,20 @@ public class MascotaServicios implements IMascotaServicio {
 
 
 	@Override
-	public Response getAllPets() {
-		Response response = new Response();
-		try {
-			List<Mascota> mascotas = mascotaRepositorio.findAll();
-			List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
+	public Response getAllPets(Usuario currentUser) {
+	    Response response = new Response();
+	    try {
+	        List<Mascota> mascotas = mascotaRepositorio.findByUsuario(currentUser);
+	        List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
 
-			response.setStatusCode(200);
-			response.setMessage("Lista de mascotas obtenida exitosamente");
-			response.setMascotas(mascotasDTO); // esto es una lista
-		} catch (Exception e) {
-			response.setStatusCode(500);
-			response.setMessage("Error al obtener las mascotas: " + e.getMessage());
-		}
-		return response;
+	        response.setStatusCode(200);
+	        response.setMessage("Lista de mascotas del usuario obtenida exitosamente");
+	        response.setMascotas(mascotasDTO);
+	    } catch (Exception e) {
+	        response.setStatusCode(500);
+	        response.setMessage("Error al obtener las mascotas del usuario: " + e.getMessage());
+	    }
+	    return response;
 	}
 
 

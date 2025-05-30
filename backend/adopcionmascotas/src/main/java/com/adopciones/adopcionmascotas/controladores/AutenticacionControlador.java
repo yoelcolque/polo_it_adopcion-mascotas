@@ -13,7 +13,7 @@ import com.adopciones.adopcionmascotas.dtos.IniciarSesion;
 import com.adopciones.adopcionmascotas.dtos.RefreshTokenSolicitud;
 import com.adopciones.adopcionmascotas.dtos.Response;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRegistroDTO;
-import com.adopciones.adopcionmascotas.servicios.interfaz.IUsuarioServicio;
+import com.adopciones.adopcionmascotas.servicios.impl.UsuarioServicios;
 
 import jakarta.validation.Valid;
 
@@ -22,11 +22,11 @@ import jakarta.validation.Valid;
 public class AutenticacionControlador {
 
 	@Autowired
-	private IUsuarioServicio usuarioServicio;
+	private UsuarioServicios usuarioServicio;
 
 	// Registrar nuevo usuario
 	@PostMapping(value = "/register" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Response> register(@Valid @ModelAttribute  UsuarioRegistroDTO dto) {
+	public ResponseEntity<Response> register(@Valid @ModelAttribute UsuarioRegistroDTO dto) {
 		Response response = usuarioServicio.register(dto);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}

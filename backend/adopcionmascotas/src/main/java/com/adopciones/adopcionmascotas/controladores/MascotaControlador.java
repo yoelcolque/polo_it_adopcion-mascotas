@@ -49,8 +49,8 @@ public class MascotaControlador {
 	}
 
 	@GetMapping
-	public ResponseEntity<Response> getAllPets() {
-		Response response = mascotaServicio.getAllPets();
+	public ResponseEntity<Response> getAllPets(@AuthenticationPrincipal Usuario currentUser) {
+		Response response = mascotaServicio.getAllPets(currentUser);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
 

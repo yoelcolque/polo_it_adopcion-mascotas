@@ -69,9 +69,6 @@ public class Mascota {
 	@OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Foto> fotos;
 
-	@OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Video> videos;
-
 	@CreationTimestamp
 	@Column(updatable = false)
 	private Date createdAt;

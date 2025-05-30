@@ -32,38 +32,39 @@ public class SecurityConfig {
 	 
 	 @Bean
 	 public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		 httpSecurity.csrf(AbstractHttpConfigurer::disable)
-		 	.cors(Customizer.withDefaults())
-		 	.authorizeHttpRequests(request -> request
-					.requestMatchers(
-							"/api/auth/register",
-							"/api/auth/login",
-							"/api/auth/refresh",
-							"/api/mascota/cercanas",
-							"/api/mascota/**",
-							"/api/mascota"
-					).permitAll()
-					//fix(api/usurios): se declara la api que requiren autenticacion
-					.requestMatchers(
-							"/api/auth/register",
-							"/api/auth/login",
-							"/api/auth/refresh",
-							"/api/usuarios/me",
-							"/api/usuarios/**",
-							"/api/mascota/agregar",
-							"/api/mascota/usuario",
-							"/api/deseados/**",
-							"/api/mascota/cercanas"
-					).authenticated()
+	     httpSecurity
+	         .csrf(AbstractHttpConfigurer::disable)
+	         .cors(Customizer.withDefaults())
+	         .authorizeHttpRequests(request -> request
+	             // Rutas públicas (no requieren token JWT)
+	             .requestMatchers(
+	                 "/api/auth/register",
+	                 "/api/auth/login",
+	                 "/api/auth/refresh",
+	                 "/api/mascota/cercanas",
+	                 "/api/mascota/**",
+	                 "/api/mascota"
+	             ).permitAll()
 
-					.anyRequest().authenticated()
-			)
-		 	.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		 	.authenticationProvider(authenticationProvider())
-		 	.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-		 
-		 return httpSecurity.build();
+	             // Rutas protegidas (requieren token JWT)
+	             .requestMatchers(
+	                 "/api/usuarios/me",
+	                 "/api/usuarios/**",
+	                 "/api/mascota/agregar",
+	                 "/api/mascota/usuario",
+	                 "/api/deseados/**"
+	             ).authenticated()
+
+	             // Todo lo demás también requiere autenticación
+	             .anyRequest().authenticated()
+	         )
+	         .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	         .authenticationProvider(authenticationProvider())
+	         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+	     return httpSecurity.build();
 	 }
+
 	 
 	 @Bean 
 	 public AuthenticationProvider authenticationProvider() {

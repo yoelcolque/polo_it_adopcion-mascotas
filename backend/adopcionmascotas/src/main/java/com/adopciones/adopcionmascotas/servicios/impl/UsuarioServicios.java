@@ -77,7 +77,9 @@ public class UsuarioServicios implements IUsuarioServicio {
 	        }
 
 	        // Obtener latitud y longitud
-	        Optional<double[]> latLng = geocodingService.obtenerLatLng(dto.getDireccion());
+	        String direccionParaGeocoding = dto.getCalle() + ", " + dto.getDistrito() + ", CABA, Buenos Aires, Argentina";
+
+	        Optional<double[]> latLng = geocodingService.obtenerLatLng(direccionParaGeocoding);
 	        latLng.ifPresent(coords -> {
 	            usuario.setLatitud(coords[0]);
 	            usuario.setLongitud(coords[1]);
