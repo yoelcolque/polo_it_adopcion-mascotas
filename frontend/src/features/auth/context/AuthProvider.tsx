@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { setupAuthInterceptor } from '../../../shared/api/authInterceptor';
 import axiosInstance from '../../../shared/api/axios';
+import { jwtDecode } from 'jwt-decode';
+
 
 export interface RegisterData {
     nombre: string;
@@ -15,8 +17,21 @@ export interface RegisterData {
     imagen: File;
 }
 
+interface DecodedToken {
+    usuarioId: number;
+    email: string;
+    exp: number;
+    // otros campos si los tiene...
+}
+
+interface User {
+    usuarioId: number;
+    email: string;
+}
+
 interface AuthContextType {
     accessToken: string | null;
+    user: User | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     register: (data: RegisterData) => Promise<void>;
@@ -26,14 +41,35 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem('accessToken'));
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        if (accessToken) {
+            const decoded = jwtDecode<DecodedToken>(accessToken);
+            setUser({
+                usuarioId: decoded.usuarioId,
+                email: decoded.email
+            });
+        } else {
+            setUser(null);
+        }
+    }, [accessToken]);
 
     const login = async (email: string, password: string) => {
         const res = await axiosInstance.post('/auth/login', { email, contrasena: password });
         const { accessToken, refreshToken } = res.data;
+
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         setAccessToken(accessToken);
+
+        const decoded = jwtDecode<DecodedToken>(accessToken);
+        setUser({
+            usuarioId: decoded.usuarioId,
+            email: decoded.email
+        });
     };
+
 
     const register = async (data: RegisterData) => {
         const telefonoCompleto = `11${data.telefono}`;
@@ -78,7 +114,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [accessToken]);
 
     return (
-        <AuthContext.Provider value={{ accessToken, login, logout, register }}>
+        <AuthContext.Provider value={{ accessToken, login, logout, register, user }}>
             {children}
         </AuthContext.Provider>
     );
