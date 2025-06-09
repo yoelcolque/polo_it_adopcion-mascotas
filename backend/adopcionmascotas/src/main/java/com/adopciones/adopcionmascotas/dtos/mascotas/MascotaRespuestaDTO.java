@@ -27,8 +27,18 @@ public class MascotaRespuestaDTO {
     private Double latitud;
     private Double longitud;
     private UsuarioRespuestaDTO usuario;
+    private Long usuarioId;
 
     // Getters y Setters
+
+
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
+    }
 
     public Long getMascotaId() {
         return mascotaId;

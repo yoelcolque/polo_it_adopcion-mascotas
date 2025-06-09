@@ -1,20 +1,21 @@
 package com.adopciones.adopcionmascotas.mappers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRegistroDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioUpdateDTO;
 import com.adopciones.adopcionmascotas.modelos.Usuario;
 
+@Component
+public class UsuarioMapper {
 
-@Mapper(componentModel = "spring")
-public abstract class UsuarioMapper {
+	@Autowired
+	private MascotaMapper mascotaMapper;
 
 	public Usuario usuarioRegistroDTOtoUsuario(UsuarioRegistroDTO dto) {
 		Usuario usuario = new Usuario();
@@ -36,10 +37,43 @@ public abstract class UsuarioMapper {
 		return usuario;
 	}
 
-	public abstract UsuarioRespuestaDTO usuarioToUsuarioRespuestaDTO(Usuario usuario);
+	public UsuarioRespuestaDTO usuarioToUsuarioRespuestaDTO(Usuario usuario) {
+		if (usuario == null) return null;
 
-	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-	public abstract void actualizarUsuarioDesdeDTO(UsuarioUpdateDTO dto, @MappingTarget Usuario usuario);
+		UsuarioRespuestaDTO dto = new UsuarioRespuestaDTO();
+		dto.setUsuarioId(usuario.getUsuarioId());
+		dto.setNombre(usuario.getNombre());
+		dto.setApellido(usuario.getApellido());
+		dto.setTelefono(usuario.getTelefono());
+		dto.setEmail(usuario.getEmail());
+		dto.setEstado(usuario.getEstado());
+		dto.setCalle(usuario.getDireccion());
+		dto.setDistrito(usuario.getDistrito());
+		dto.setEdad(usuario.getEdad());
+		dto.setFotoPerfil(usuario.getFotoPerfil());
+		dto.setLatitud(usuario.getLatitud());
+		dto.setLongitud(usuario.getLongitud());
 
-	public abstract List<UsuarioRespuestaDTO> usuariosToUsuarioRespuestaDTOs(List<Usuario> usuarios);
-}	
+		if (usuario.getMascotas() != null) {
+			dto.setMascotas(mascotaMapper.mascotasToMascotaRespuestaDTOs(usuario.getMascotas()));
+		}
+
+		return dto;
+	}
+
+	public void actualizarUsuarioDesdeDTO(UsuarioUpdateDTO dto, Usuario usuario) {
+		if (dto.getNombre() != null) usuario.setNombre(dto.getNombre());
+		if (dto.getApellido() != null) usuario.setApellido(dto.getApellido());
+		if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
+		if (dto.getEstado() != null) usuario.setEstado(dto.getEstado());
+		if (dto.getDireccion() != null) usuario.setDireccion(dto.getDireccion());
+		if (dto.getDistrito() != null) usuario.setDistrito(dto.getDistrito());
+		if (dto.getEdad() > 0) usuario.setEdad(dto.getEdad());
+	}
+
+	public List<UsuarioRespuestaDTO> usuariosToUsuarioRespuestaDTOs(List<Usuario> usuarios) {
+		return usuarios.stream()
+				.map(this::usuarioToUsuarioRespuestaDTO)
+				.collect(Collectors.toList());
+	}
+}

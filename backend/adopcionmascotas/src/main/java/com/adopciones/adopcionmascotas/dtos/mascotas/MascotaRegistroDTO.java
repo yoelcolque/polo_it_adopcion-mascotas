@@ -9,8 +9,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
+
 
 public class MascotaRegistroDTO {
+
+    private MultipartFile imagen;
 
     @NotBlank
     private String nombre;
@@ -38,6 +42,14 @@ public class MascotaRegistroDTO {
     private Double longitud;
 
     // Getters y Setters
+    public MultipartFile getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(MultipartFile imagen) {
+        this.imagen = imagen;
+    }
+
     public String getNombre() {
         return nombre;
     }

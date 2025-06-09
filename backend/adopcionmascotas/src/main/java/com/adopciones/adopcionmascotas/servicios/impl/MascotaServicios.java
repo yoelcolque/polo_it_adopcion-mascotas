@@ -27,6 +27,9 @@ public class MascotaServicios implements IMascotaServicio {
 	@Autowired
 	private MascotaMapper mascotaMapper;
 
+	@Autowired
+	private CloudinaryServicio cloudinaryService;
+
 	@Override
 	public Response createPet(MascotaRegistroDTO mascotaDTO, Usuario currentUser) {
 		Response response = new Response();
@@ -36,23 +39,24 @@ public class MascotaServicios implements IMascotaServicio {
 				throw new OurException("No se pudo obtener el usuario autenticado");
 			}
 
+			// Crear la entidad desde el DTO
 			Mascota mascota = mascotaMapper.mascotaRegistroDTOToMascota(mascotaDTO);
 			mascota.setEstado(EstadoMascota.DISPONIBLE);
 			mascota.setUsuario(currentUser);
 
-			Mascota savedMascota = mascotaRepositorio.save(mascota);
-
-			MascotaRespuestaDTO mascotaRespuestaDTO;
-			try {
-				mascotaRespuestaDTO = mascotaMapper.mascotaToMascotaRespuestaDTO(savedMascota);
-			} catch (Exception e) {
-				System.err.println(" Error al mapear mascota a DTO: " + e.getMessage());
-				e.printStackTrace();
-				response.setStatusCode(500);
-				response.setMessage("Error interno al convertir la mascota.");
-				return response;
+			// Subir imagen si fue proporcionada
+			if (mascotaDTO.getImagen() != null && !mascotaDTO.getImagen().isEmpty()) {
+				String url = cloudinaryService.subirImagen(mascotaDTO.getImagen());
+				mascota.setFotoUrl(url);
 			}
 
+			// Guardar en base de datos
+			Mascota savedMascota = mascotaRepositorio.save(mascota);
+
+			// Mapear a DTO de respuesta
+			MascotaRespuestaDTO mascotaRespuestaDTO = mascotaMapper.mascotaToMascotaRespuestaDTO(savedMascota);
+
+			// Armar respuesta
 			response.setStatusCode(200);
 			response.setMessage("Mascota añadida exitosamente");
 			response.setMascota(mascotaRespuestaDTO);
@@ -63,6 +67,7 @@ public class MascotaServicios implements IMascotaServicio {
 		} catch (Exception e) {
 			response.setStatusCode(500);
 			response.setMessage("Error al añadir la mascota: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		return response;
@@ -171,19 +176,28 @@ public class MascotaServicios implements IMascotaServicio {
 			}
 
 			mascotaMapper.actualizarMascotaDesdeDTO(updatedDTO, mascota);
+
+			if (updatedDTO.getImagen() != null && !updatedDTO.getImagen().isEmpty()) {
+				String nuevaUrl = cloudinaryService.subirImagen(updatedDTO.getImagen());
+				mascota.setFotoUrl(nuevaUrl);
+			}
+
 			mascotaRepositorio.save(mascota);
 
 			response.setStatusCode(200);
 			response.setMessage("Mascota actualizada correctamente");
+
 		} catch (OurException e) {
 			response.setStatusCode(403);
 			response.setMessage(e.getMessage());
 		} catch (Exception e) {
 			response.setStatusCode(500);
 			response.setMessage("Error al actualizar la mascota: " + e.getMessage());
+			e.printStackTrace();
 		}
 		return response;
 	}
+
 
 	public Response getPetsByUsuario(Usuario currentUser) {
 		Response response = new Response();
@@ -223,4 +237,21 @@ public class MascotaServicios implements IMascotaServicio {
 		}
 		return response;
 	}
+
+	public Response getAllPublicPets() {
+		Response response = new Response();
+		try {
+			List<Mascota> mascotas = mascotaRepositorio.findByEstado(EstadoMascota.DISPONIBLE);
+			List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
+
+			response.setStatusCode(200);
+			response.setMessage("Mascotas públicas disponibles");
+			response.setMascotas(mascotasDTO);
+		} catch (Exception e) {
+			response.setStatusCode(500);
+			response.setMessage("Error al obtener mascotas públicas: " + e.getMessage());
+		}
+		return response;
+	}
+
 }

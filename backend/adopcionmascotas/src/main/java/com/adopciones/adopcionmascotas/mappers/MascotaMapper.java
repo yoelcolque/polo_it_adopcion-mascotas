@@ -59,6 +59,11 @@ public class MascotaMapper {
 		dto.setUbicacionTexto(mascota.getUbicacionTexto());
 		dto.setLatitud(mascota.getLatitud());
 		dto.setLongitud(mascota.getLongitud());
+		dto.setImagen(mascota.getFotoUrl());
+
+		dto.setUsuarioId(mascota.getUsuario().getUsuarioId()); // 👈 NUEVO
+
+
 
 		return dto;
 	}

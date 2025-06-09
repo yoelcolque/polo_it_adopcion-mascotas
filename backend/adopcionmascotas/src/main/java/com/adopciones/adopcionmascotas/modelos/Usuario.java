@@ -70,20 +70,20 @@ public class Usuario implements UserDetails {
 
 	@Enumerated(EnumType.STRING)
 	private EstadoUsuario estado; // ACTIVO, INACTIVO
-
+	//-------------------------------------------
 	@NotEmpty
 	private String direccion;
 	
 	@NotEmpty	
 	private String distrito;
-	
+	//--------------------------------------------
 	@Min(18)
 	@Max(99)
     private int edad;
-
+	//------------------------------------------------------------------
 	private Double latitud; // generado con OpenCage
 	private Double longitud; // generado con OpenCage
-
+	//-------------------------------------------------------------------
 	private String fotoPerfil; // Cloudinary
 	private Boolean verificado = false;
 

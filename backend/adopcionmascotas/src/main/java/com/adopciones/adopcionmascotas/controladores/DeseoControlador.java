@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.adopciones.adopcionmascotas.mappers.MascotaMapper;
+import java.util.List;
 
 
 @RestController
@@ -82,6 +83,17 @@ public class DeseoControlador {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/ids")
+    public ResponseEntity<List<Long>> obtenerIdsDeseados(@AuthenticationPrincipal Usuario usuario) {
+        List<Long> ids = listaDeseoRepositorio.findByUsuario(usuario)
+                .stream()
+                .map(ld -> ld.getMascota().getMascotaId())
+                .toList();
+
+        return ResponseEntity.ok(ids);
+    }
+
 
 }
 

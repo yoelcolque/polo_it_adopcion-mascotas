@@ -57,11 +57,12 @@ public class Mascota {
 
 	private Boolean vacunado;
 	private Boolean esterilizado;
+	//------------------------------------------
 
 	private String ubicacionTexto;
 	private Double latitud;
 	private Double longitud;
-
+	//------------------------------------------
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "usuario_id")
 	private Usuario usuario;
@@ -72,6 +73,18 @@ public class Mascota {
 	@CreationTimestamp
 	@Column(updatable = false)
 	private Date createdAt;
+
+	@Column(name = "foto_url")
+	private String fotoUrl;
+
+	public String getFotoUrl() {
+		return fotoUrl;
+	}
+
+	public void setFotoUrl(String fotoUrl) {
+		this.fotoUrl = fotoUrl;
+	}
+
 
 	@UpdateTimestamp
 	private Date updatedAt;

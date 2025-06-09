@@ -20,6 +20,10 @@ import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaUpdateDTO;
 import com.adopciones.adopcionmascotas.modelos.Usuario;
 import com.adopciones.adopcionmascotas.repositorios.UsuarioRepositorio;
 import com.adopciones.adopcionmascotas.servicios.impl.MascotaServicios;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.http.MediaType;
+
 
 @RestController
 @RequestMapping("/api/mascota")
@@ -31,16 +35,17 @@ public class MascotaControlador {
 	@Autowired
 	private UsuarioRepositorio usuarioRepositorio;
 
-	@PostMapping("/agregar")
-	public ResponseEntity<Response> createPet(@RequestBody MascotaRegistroDTO mascotaDTO,
+	@PostMapping(value = "/agregar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Response> createPet(@Valid @ModelAttribute MascotaRegistroDTO mascotaDTO,
 											  @AuthenticationPrincipal Usuario currentUser) {
+
 		Response response = mascotaServicio.createPet(mascotaDTO, currentUser);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
 
 	@GetMapping("/usuario")
 	public ResponseEntity<Response> getMyPets(@AuthenticationPrincipal UserDetails userDetails) {
-		String email = userDetails.getUsername(); // El JWT debe tener el email como subject
+		String email = userDetails.getUsername();
 		Usuario currentUser = usuarioRepositorio.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -54,19 +59,27 @@ public class MascotaControlador {
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
 
+	@GetMapping("/todas")
+	public ResponseEntity<Response> getAllPublicPets() {
+		Response response = mascotaServicio.getAllPublicPets();
+		return ResponseEntity.status(response.getStatusCode()).body(response);
+	}
+
+
 	@GetMapping("/{mascotaId}")
 	public ResponseEntity<Response> getPetById(@PathVariable Long mascotaId) {
 		Response response = mascotaServicio.getPetById(mascotaId);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
 
-	@PutMapping("/editar/{mascotaId}")
+	@PutMapping(value = "/editar/{mascotaId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Response> updatePet(@PathVariable Long mascotaId,
-											  @RequestBody MascotaUpdateDTO mascotaDTO,
+											  @ModelAttribute MascotaUpdateDTO mascotaDTO,
 											  @AuthenticationPrincipal Usuario currentUser) {
 		Response response = mascotaServicio.updatePet(mascotaId, mascotaDTO, currentUser);
 		return ResponseEntity.status(response.getStatusCode()).body(response);
 	}
+
 
 	@DeleteMapping("/{mascotaId}")
 	public ResponseEntity<Response> deletePet(@PathVariable Long mascotaId,

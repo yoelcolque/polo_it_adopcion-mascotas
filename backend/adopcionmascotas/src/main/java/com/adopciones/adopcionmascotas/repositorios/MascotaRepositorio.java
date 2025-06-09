@@ -8,9 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import com.adopciones.adopcionmascotas.modelos.Mascota;
 import com.adopciones.adopcionmascotas.modelos.Usuario;
+import com.adopciones.adopcionmascotas.modelos.EstadoMascota;
 
 
 public interface MascotaRepositorio extends JpaRepository<Mascota, Long> {
+    List<Mascota> findByEstado(EstadoMascota estado);
+
     List<Mascota> findByUsuario(Usuario usuario);
 
     @Query(value = """
