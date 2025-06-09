@@ -13,9 +13,14 @@ import LayoutWithHeader from './LayoutWithHeader';
 import { useAuth } from '../features/auth/context/AuthProvider';
 import type { ReactNode } from 'react';
 import { DeseosProvider } from '../shared/context/DeseosContext';
-import { MascotasProvider } from '../shared/context/MascotasContext'; // ✅
+import { MascotasProvider } from '../shared/context/MascotasContext';
 import 'leaflet/dist/leaflet.css';
 import { MapaProvider } from '../shared/context/MapaContext';
+import HomePage from '../features/auth/pages/HomePage';
+import DetalleMascotaPage from "../features/mascotas/pages/DetalleMascotaPage.tsx";
+import ChatPage from "../features/chats/pages/ChatPage.tsx";
+
+
 
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
@@ -27,6 +32,8 @@ const App = () => (
     <Router>
         <Routes>
             {/* Públicas */}
+
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
@@ -48,6 +55,10 @@ const App = () => (
                 <Route path="/registrar" element={<PrivateRoute><RegistrarMascotaPage /></PrivateRoute>} />
                 <Route path="/editar/:id" element={<PrivateRoute><EditarMascotaPage /></PrivateRoute>} />
                 <Route path="/perfil" element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
+                <Route path="/mascota/:id" element={<PrivateRoute><DetalleMascotaPage /></PrivateRoute>} />
+
+                {/* aqui esta la page chat(posdata: recorde que lo ibamos a quitar--- aunque falta el feature de reseñas y comentarios)) */}
+                <Route path="/chat" element={<PrivateRoute><ChatPage/></PrivateRoute>} />
             </Route>
 
             {/* Públicas para testing */}
@@ -58,6 +69,9 @@ const App = () => (
                 <Route path="/buscars" element={<BuscarMascotaPage />} />
                 <Route path="/perfils" element={<PerfilPage />} />
                 <Route path="/editars/:id" element={<EditarMascotaPage />} />
+                {/* aqui esta la page chat(posdata: recorde que lo ibamos a quitar--- aunque falta el feature de reseñas y comentarios)) */}
+                <Route path="/chat" element={<PrivateRoute><ChatPage/></PrivateRoute>} />
+
             </Route>
         </Routes>
     </Router>
