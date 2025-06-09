@@ -1,27 +1,71 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../features/auth/context/AuthProvider';
+import { Link, useLocation } from 'react-router-dom';
+import classNames from 'classnames';
+
+const navItems = [
+    { to: '/home', icon: '/Home.svg', label: 'Home' },
+    { to: '/registrar', icon: '/Edit.svg', label: 'Registrar'},
+    { to: '/deseados', icon: '/Heart.svg', label: 'Deseados' },
+    { to: '/buscar', icon: '/Search.svg', label: 'Buscar' },
+    { to: '/perfil', icon: '/User.svg', label: 'Perfil' },
+    { to: '/chat', icon: '/letter.svg', label: 'Chat' },
+];
+
 
 const Header = () => {
-    const { logout } = useAuth();
+    const { pathname } = useLocation();
 
     return (
-        <header className="bg-surface shadow-md py-4 px-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
-                <span className="text-xl font-heading text-primary">Adopta con Amor</span>
-            </div>
+        <aside
+            className={classNames(
+                //bg-[#006775]
+                ' bg-[#006775] shadow-md flex items-center justify-around',
+                'fixed bottom-0 w-full h-[70px] z-20 bg-[#006775] ',
 
-            <nav className="flex gap-4 text-sm font-semibold text-muted">
-                <Link to="/">Inicio</Link>
-                <Link to="/buscar">Buscar Mascota</Link>
-                <Link to="/deseados">Deseados</Link>
-                <Link to="/registrar">Registrar</Link>
-                <Link to="/perfil">Perfil</Link>
-                <button onClick={logout} className="text-error hover:underline">
-                    Cerrar sesión
-                </button>
-            </nav>
-        </header>
+                'md:static md:flex-col md:justify-start md:items-center',
+                'md:w-[85px] md:min-h-screen md:h-auto md:py-6'
+            )}
+        >
+
+            {navItems.map(({ to, icon, label }) => {
+                const isActive = pathname === to;
+
+                return (
+                    <Link key={to} to={to} className="group flex flex-col items-center sm:flex-col gap-1 relative">
+                        <img
+                            src={icon}
+                            alt={label}
+                            className={classNames(
+                                'h-6 w-6 transition-transform duration-200 filter',
+                                isActive
+                                    ? 'sepia brightness-[1.7] hue-rotate-[10deg] saturate-[1000%] contrast-[190%]'
+                                    : 'brightness-150 opacity-70',
+                                'group-hover:scale-110'
+                            )}
+                        />
+
+                        <span
+                            className={classNames(
+                                'text-xs font-semibold',
+                                isActive ? 'text-white' : 'text-white/70',
+                                'group-hover:text-white'
+                            )}
+                        >
+              {label}
+            </span>
+                        {isActive && (
+                            <div
+                                className={classNames(
+                                    'w-4 h-1 bg-[#E8672D] rounded-full',
+                                    'mt-1',
+                                    'sm:mt-1 sm:static'
+                                )}
+                            />
+                        )}
+
+                    </Link>
+                );
+            })}
+        </aside>
     );
 };
 

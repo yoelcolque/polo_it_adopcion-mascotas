@@ -4,13 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#fb923c',
-        primaryDark: '#ea580c',
-        accent: '#22d3ee',
-        error: '#f43f5e',
-        background: '#fff7ed',
+        primary: '#096A7F',
+        primaryDark: '#209DB7',
+        accent: '#E8672D',
+        error: '#02191E',
+        background: '#ECF4F5',
         surface: '#fffbf2',
-        text: '#1e293b',
+        text: '#02191E',
         muted: '#64748b'
       },
       fontFamily: {
@@ -30,7 +30,17 @@ export default {
         '5xl': ['3rem', {lineHeight: '1'}],
         title: ['2rem', {lineHeight: '2.25rem', letterSpacing: '-0.02em'}],
         display: ['3.75rem', {lineHeight: '1', letterSpacing: '-0.03em'}]
-      }
+      },
+      animation: {
+        bounce: 'bounce 0.6s infinite',
+      },
+      screens: {
+        xs: '450px', //medida para movil (lo saque del ux/ui del diseño figma)
+        sm: '0px', // default
+        md: '760px', // personalizado para cambiar el layout aquí
+        'md-e': '780px',
+        'lg-e': '1170px',
+      },
     }
   }
 }
