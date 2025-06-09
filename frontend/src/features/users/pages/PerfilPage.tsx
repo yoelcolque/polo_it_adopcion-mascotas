@@ -46,10 +46,12 @@ const PerfilPage = () => {
         return <p className="p-6 text-error">No se pudo cargar el perfil del usuario.</p>;
     }
 
+    const { logout } = useAuth();
     return (
         <div className="min-h-screen p-6 bg-background font-sans">
-            <h1 className="text-3xl font-heading text-text mb-6">Mi perfil</h1>
-
+            <button onClick={logout} className="text-error hover:underline">
+                Cerrar sesión
+            </button>
             <div className="grid grid-cols-[150px_1fr_1fr] grid-rows-[auto_auto_auto] gap-4">
                 {/* Imagen */}
                 <div className="row-span-2 flex justify-center items-center">
@@ -78,15 +80,19 @@ const PerfilPage = () => {
                                 <TarjetaMascota
                                     key={m.mascotaId}
                                     mascota={{
-                                        id: m.mascotaId,
+                                        mascotaId: m.mascotaId,
                                         nombre: m.nombre,
-                                        especie: m.especieMascota,
-                                        edad: `${m.edad} años`,
+                                        especieMascota: m.especieMascota,
+                                        edad: m.edad,
                                         descripcion: m.temperamento || 'Sin descripción',
-                                        imagenUrl: m.fotos?.[0] || '/placeholder.png',
-                                        contactoUrl: `/perfil/${m.mascotaId}`
+                                        imagen: m.imagen || '/placeholder.png',
+                                        contactoUrl: `/perfil/${m.mascotaId}`,
+                                        usuarioId: m.usuarioId,
+                                        estado: m.estado,
                                     }}
+                                    usuarioActualId={usuario.usuarioId}
                                 />
+
                             ))
                         )}
                     </div>
