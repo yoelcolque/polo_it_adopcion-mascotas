@@ -17,9 +17,8 @@ export const DeseosProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const fetchDeseados = async () => {
             try {
-                const res = await axiosInstance.get('/deseados');
-                const lista = res.data?.mascotas || [];
-                const ids = new Set(lista.map((m: any) => m.mascotaId));
+                const res = await axiosInstance.get('/deseados/ids');
+                const ids = new Set<number>(res.data);
                 setDeseados(ids);
             } catch (err) {
                 console.error('Error al obtener lista de deseos', err);
@@ -30,6 +29,7 @@ export const DeseosProvider = ({ children }: { children: React.ReactNode }) => {
 
         fetchDeseados();
     }, []);
+
 
     const toggleDeseado = async (mascotaId: number) => {
         try {
