@@ -4,7 +4,7 @@ import axiosInstance from '../../../shared/api/axios';
 import { useAuth } from '../../auth/context/AuthProvider';
 
 const DeseadosPage = () => {
-    const { accessToken } = useAuth();
+    const { accessToken, user } = useAuth();
     const [mascotas, setMascotas] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -35,14 +35,16 @@ const DeseadosPage = () => {
                         <TarjetaMascota
                             key={m.mascotaId}
                             mascota={{
-                                id: m.mascotaId,
+                                mascotaId: m.mascotaId,
                                 nombre: m.nombre,
-                                especie: m.especieMascota,
-                                edad: `${m.edad} años`,
+                                especieMascota: m.especieMascota,
+                                edad: m.edad,
                                 descripcion: m.temperamento || 'Sin descripción disponible',
-                                imagenUrl: m.fotos?.[0] || '/placeholder.png',
-                                contactoUrl: `/perfil/${m.mascotaId}`
+                                imagen: m.imagen || '/placeholder.png',
+                                contactoUrl: `/perfil/${m.mascotaId}`,
+                                usuarioId: m.usuarioId
                             }}
+                            usuarioActualId={user?.usuarioId || 0}
                         />
                     ))}
                 </div>
