@@ -19,7 +19,7 @@ import { MapaProvider } from '../shared/context/MapaContext';
 import HomePage from '../features/auth/pages/HomePage';
 import DetalleMascotaPage from "../features/mascotas/pages/DetalleMascotaPage.tsx";
 import ChatPage from "../features/chats/pages/ChatPage.tsx";
-
+import ListaChatsPage from '../features/chats/pages/ListaChatsPage';
 
 
 
@@ -56,7 +56,8 @@ const App = () => (
                 <Route path="/editar/:id" element={<PrivateRoute><EditarMascotaPage /></PrivateRoute>} />
                 <Route path="/perfil" element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
                 <Route path="/mascota/:id" element={<PrivateRoute><DetalleMascotaPage /></PrivateRoute>} />
-
+                <Route path="/chat/mis-chats" element={<PrivateRoute><ListaChatsPage /></PrivateRoute>} />
+                <Route path="/chat/:chatId" element={<ChatPage />} />
                 {/* aqui esta la page chat(posdata: recorde que lo ibamos a quitar--- aunque falta el feature de reseñas y comentarios)) */}
                 <Route path="/chat" element={<PrivateRoute><ChatPage/></PrivateRoute>} />
             </Route>

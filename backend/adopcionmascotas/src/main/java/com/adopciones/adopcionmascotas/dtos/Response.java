@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRespuestaDTO;
 import com.adopciones.adopcionmascotas.dtos.usuarios.UsuarioRespuestaDTO;
+import com.adopciones.adopcionmascotas.modelos.Chat;
+import com.adopciones.adopcionmascotas.modelos.Mensaje;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,6 +15,11 @@ public class Response {
 	private int statusCode;
 	private String message;
 
+	private Chat chat;
+	private Mensaje mensaje;
+	private List<Mensaje> mensajes;
+	private Object objeto;
+	
 	@JsonProperty("accessToken")
 	private String token;
 	private String refreshToken;
@@ -103,5 +110,37 @@ public class Response {
 
 	public void setMascotas(List<MascotaRespuestaDTO> mascotas) {
 		this.mascotas = mascotas;
+	}
+
+	public Chat getChat() {
+		return chat;
+	}
+
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
+
+	public Mensaje getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(Mensaje mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	public List<Mensaje> getMensajes() {
+		return mensajes;
+	}
+
+	public void setMensajes(List<Mensaje> mensajes) {
+		this.mensajes = mensajes;
+	}
+
+	public Object getObjeto() {
+		return objeto;
+	}
+
+	public void setObjeto(Object objeto) {
+		this.objeto = objeto;
 	}
 }	

@@ -1,41 +1,39 @@
 package com.adopciones.adopcionmascotas.modelos;
 
-import java.util.Date;
+import java.util.List;
 
-import org.hibernate.annotations.CreationTimestamp;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "mensajes")
-public class Mensaje {
-
+@Table(name = "chats")
+public class Chat {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String contenido;
+	@ManyToOne
+	@JoinColumn(name = "adoptante_id")
+	private Usuario adoptante;
 
 	@ManyToOne
-	@JoinColumn(name = "emisor_id")
-	private Usuario emisor;
+	@JoinColumn(name = "dueno_id")
+	private Usuario dueno;
 
 	@ManyToOne
-	@JoinColumn(name = "receptor_id")
-	private Usuario receptor;
+	@JoinColumn(name = "mascota_id")
+	private Mascota mascota;
 
-	@ManyToOne
-	@JoinColumn(name = "chat_id")
-	private Chat chat;
-
-	@CreationTimestamp
-	private Date timestamp;
+	@OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Mensaje> mensajes;
 }

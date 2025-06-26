@@ -8,7 +8,7 @@ const navItems = [
     { to: '/deseados', icon: '/Heart.svg', label: 'Deseados' },
     { to: '/buscar', icon: '/Search.svg', label: 'Buscar' },
     { to: '/perfil', icon: '/User.svg', label: 'Perfil' },
-    { to: '/chat', icon: '/letter.svg', label: 'Chat' },
+    { to: '/chat/mis-chats', icon: '/letter.svg', label: 'Chat' },
 ];
 
 const Header = () => {

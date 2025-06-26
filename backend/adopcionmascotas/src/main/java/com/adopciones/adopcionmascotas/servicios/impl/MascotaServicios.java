@@ -3,7 +3,6 @@ package com.adopciones.adopcionmascotas.servicios.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import com.adopciones.adopcionmascotas.dtos.Response;
@@ -239,19 +238,17 @@ public class MascotaServicios implements IMascotaServicio {
 	}
 
 	public Response getAllPublicPets() {
-		Response response = new Response();
-		try {
-			List<Mascota> mascotas = mascotaRepositorio.findByEstado(EstadoMascota.DISPONIBLE);
-			List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
-
-			response.setStatusCode(200);
-			response.setMessage("Mascotas públicas disponibles");
-			response.setMascotas(mascotasDTO);
-		} catch (Exception e) {
-			response.setStatusCode(500);
-			response.setMessage("Error al obtener mascotas públicas: " + e.getMessage());
+		  Response response = new Response();
+		  try {
+		    List<Mascota> mascotas = mascotaRepositorio.findByEstado(EstadoMascota.DISPONIBLE);
+		    List<MascotaRespuestaDTO> mascotasDTO = mascotaMapper.mascotasToMascotaRespuestaDTOs(mascotas);
+		    response.setStatusCode(200);
+		    response.setMessage("Mascotas públicas disponibles");
+		    response.setMascotas(mascotasDTO);
+		  } catch (Exception e) {
+		    response.setStatusCode(500);
+		    response.setMessage("Error al obtener mascotas públicas: " + e.getMessage());
+		  }
+		  return response;
 		}
-		return response;
-	}
-
 }

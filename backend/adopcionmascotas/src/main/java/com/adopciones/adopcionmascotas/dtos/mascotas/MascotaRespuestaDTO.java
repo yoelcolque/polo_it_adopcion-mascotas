@@ -28,7 +28,7 @@ public class MascotaRespuestaDTO {
     private Double longitud;
     private UsuarioRespuestaDTO usuario;
     private Long usuarioId;
-
+    private String duenoEmail;
     // Getters y Setters
 
 
@@ -183,4 +183,12 @@ public class MascotaRespuestaDTO {
     public void setUsuario(UsuarioRespuestaDTO usuario) {
         this.usuario = usuario;
     }
+
+	public String getDuenoEmail() {
+		return duenoEmail;
+	}
+
+	public void setDuenoEmail(String duenoEmail) {
+		this.duenoEmail = duenoEmail;
+	}
 }

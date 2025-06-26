@@ -52,7 +52,8 @@ public class SecurityConfig {
 	                 "/api/usuarios/**",
 	                 "/api/mascota/agregar",
 	                 "/api/mascota/usuario",
-	                 "/api/deseados/**"
+	                 "/api/deseados/**",
+	                 "/api/chat/**" 
 	             ).authenticated()
 
 	             // Todo lo demás también requiere autenticación

@@ -2,7 +2,6 @@ package com.adopciones.adopcionmascotas.mappers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.adopciones.adopcionmascotas.dtos.mascotas.MascotaRegistroDTO;
@@ -60,7 +59,7 @@ public class MascotaMapper {
 		dto.setLatitud(mascota.getLatitud());
 		dto.setLongitud(mascota.getLongitud());
 		dto.setImagen(mascota.getFotoUrl());
-
+		dto.setDuenoEmail(mascota.getUsuario().getEmail());
 		dto.setUsuarioId(mascota.getUsuario().getUsuarioId()); // 👈 NUEVO
 
 
