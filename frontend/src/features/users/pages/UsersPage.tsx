@@ -16,46 +16,46 @@ interface Mascota {
   duenoEmail: string;
 }
 
-interface UserProfile {
-  email: string;
-  usuarioId: number;
-}
-
 const UsersPage = () => {
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
+  const [mascotasFiltradas, setMascotasFiltradas] = useState<Mascota[]>([]);
   const [loading, setLoading] = useState(true);
-  const [usuarioActualId, setUsuarioActualId] = useState<number>(0);
-  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
   const { user, accessToken } = useAuth();
+  const navigate = useNavigate();
 
+  // Obtener todas las mascotas
   useEffect(() => {
     const fetchMascotas = async () => {
       try {
+        console.log('Fetching mascotas from /mascota/todas');
         const res = await axiosInstance.get('/mascota/todas');
+        console.log('Mascotas response:', JSON.stringify(res.data, null, 2));
         setMascotas(res.data.mascotas || []);
-      } catch (err) {
-        console.error('Error al obtener mascotas:', err);
+      } catch (err: any) {
+        console.error('Error al obtener mascotas:', err.response?.data || err.message);
+        setError('No se pudieron cargar las mascotas. Intenta de nuevo más tarde.');
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchUserProfile = async () => {
-      if (!accessToken || !user) return;
-      try {
-        const res = await axiosInstance.get('/usuario/perfil', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const profile: UserProfile = res.data;
-        setUsuarioActualId(profile.usuarioId);
-      } catch (err) {
-        console.error('Error al obtener perfil:', err);
-      }
-    };
-
     fetchMascotas();
-    fetchUserProfile();
-  }, [accessToken, user]);
+  }, []);
+
+  // Filtrar mascotas usando email
+  useEffect(() => {
+    console.log('Filtering mascotas. user:', user, 'mascotas:', mascotas);
+    if (!user) {
+      setMascotasFiltradas(mascotas);
+    } else {
+      const filtradas = mascotas.filter(
+        (mascota: Mascota) => mascota.duenoEmail.toLowerCase() !== user.email.toLowerCase()
+      );
+      setMascotasFiltradas(filtradas);
+      console.log('Mascotas filtradas:', filtradas, 'email:', user.email);
+    }
+  }, [mascotas, user]);
 
   return (
     <div className="min-h-screen bg-background p-6 font-sans">
@@ -68,13 +68,22 @@ const UsersPage = () => {
       </section>
       <div>
         <h2 className="text-2xl font-heading text-text mb-6">Mascotas registradas</h2>
-        <div className="grid sm:grid-cols-1 md-e:grid-cols-2 lg-e:grid-cols-3 gap-6 justify-items-center">
-          {loading ? (
-            <p className="text-muted">Cargando mascotas...</p>
-          ) : mascotas.length === 0 ? (
-            <p className="text-muted">No hay mascotas cargadas aún.</p>
-          ) : (
-            mascotas.map((m) => (
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
+        {loading ? (
+          <p className="text-muted">Cargando mascotas...</p>
+        ) : mascotasFiltradas.length === 0 ? (
+          <p className="text-muted">
+            {user
+              ? 'No hay mascotas disponibles de otros usuarios.'
+              : 'No hay mascotas disponibles.'}
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-1 md-e:grid-cols-2 lg-e:grid-cols-3 gap-6 justify-items-center">
+            {mascotasFiltradas.map((m) => (
               <TarjetaMascota
                 key={m.mascotaId}
                 mascota={{
@@ -89,11 +98,11 @@ const UsersPage = () => {
                   estado: m.estado,
                   duenoEmail: m.duenoEmail,
                 }}
-                usuarioActualId={usuarioActualId}
+                usuarioActualId={0} // Temporal hasta que obtengamos usuarioId
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

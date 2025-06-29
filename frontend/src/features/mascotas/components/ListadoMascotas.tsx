@@ -1,48 +1,38 @@
 import TarjetaMascota from './TarjetaMascota';
+import { useAuth } from '../../auth/context/AuthProvider';
 
-type Mascota = {
-    mascotaId: number;
-    nombre: string;
-    especieMascota?: string;
-    edad?: number;
-    descripcion?: string;
-    imagen?: string;
-    contactoUrl?: string;
-    usuarioId: number;
-    estado?: string;
-};
+interface Mascota {
+  mascotaId: number;
+  nombre: string;
+  duenoEmail: string;
+  latitud?: number;
+  longitud?: number;
+  ubicacionTexto?: string;
+  especieMascota?: string;
+  sexoMascota?: string;
+  edad?: number;
+  vacunado?: boolean;
+  esterilizado?: boolean;
+  descripcion?: string;
+  imagen?: string;
+  contactoUrl?: string;
+  estado?: string;
+}
 
-type Props = {
-    mascotas: Mascota[];
-    usuarioActualId: number;
-};
+interface ListadoMascotasProps {
+  mascotas: Mascota[];
+}
 
-const ListadoMascotas = ({ mascotas, usuarioActualId }: Props) => {
-    if (mascotas.length === 0) {
-        return <p className="text-muted">No hay resultados para mostrar.</p>;
-    }
+const ListadoMascotas = ({ mascotas }: ListadoMascotasProps) => {
+  const { user } = useAuth();
 
-    return (
-        <div
-            className={`
-            overflow-y-auto
-            max-h-[700px]
-            pb-2
-        `}
-        >
-            <div className="grid sm:grid-cols-1 md-e:grid-cols-2 lg-e:grid-cols-3 gap-6 justify-items-center">
-                {mascotas.map(m => (
-                    <TarjetaMascota
-                        key={m.mascotaId}
-                        mascota={m}
-                        usuarioActualId={usuarioActualId}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-
-
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {mascotas.map((mascota) => (
+        <TarjetaMascota key={mascota.mascotaId} mascota={mascota} user={user} />
+      ))}
+    </div>
+  );
 };
 
 export default ListadoMascotas;

@@ -1,62 +1,71 @@
-import { useState } from 'react';
-import { Marker, useMap } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
+import { type LatLngExpression } from 'leaflet';
 import L from 'leaflet';
-import { createPortal } from 'react-dom';
 import TarjetaMascota from './TarjetaMascota';
+import { useDeseos } from '../../../shared/context/DeseosContext';
 
-const CustomMarker = ({ mascota, usuarioActualId }: any) => {
-    const [hover, setHover] = useState(false);
-    const map = useMap();
+interface Mascota {
+  mascotaId: number;
+  nombre: string;
+  duenoEmail: string;
+  latitud: number;
+  longitud: number;
+  ubicacionTexto?: string;
+  especieMascota?: string;
+  sexoMascota?: string;
+  edad?: number;
+  vacunado?: boolean;
+  esterilizado?: boolean;
+  descripcion?: string;
+  imagen?: string;
+  contactoUrl?: string;
+  estado?: string;
+}
 
-    if (!mascota || mascota.latitud == null || mascota.longitud == null) return null;
+interface CustomMarkerProps {
+  mascota: Mascota;
+  user?: { email: string };
+}
 
-    const position = [mascota.latitud, mascota.longitud] as [number, number];
-    const offsetY = window.innerWidth < 768 ? 60 : 0;
-    const offsetX = window.innerWidth < 768 ? 0 : -100;
+const CustomMarker = ({ mascota, user }: CustomMarkerProps) => {
+  const { isDeseado, toggleDeseado } = useDeseos();
 
-    const icon = L.divIcon({
-        className: '',
-        html: `
-      <div class="w-10 h-10 rounded-full border-2 border-primary shadow-md bg-white overflow-hidden flex items-center justify-center">
+  if (!mascota || mascota.latitud == null || mascota.longitud == null) return null;
+
+  const icon = L.divIcon({
+    className: '',
+    html: `
+      <div class="w-14 h-14 rounded-full border-2 border-primary shadow-md bg-white overflow-hidden flex items-center justify-center">
         ${
-            mascota.imagen
-                ? `<img src="${mascota.imagen}" alt="${mascota.nombre}" class="w-full h-full object-cover rounded-full"/>`
-                : `<span class="text-white text-xs">🐾</span>`
+          mascota.imagen
+            ? `<img src="${mascota.imagen}" alt="${mascota.nombre}" class="w-full h-full object-cover rounded-full"/>`
+            : `<span class="text-white text-sm">🐾</span>`
         }
       </div>
     `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
-    });
+    iconSize: [56, 56], // Ajustado para w-14 h-14 (14 * 4 = 56px)
+    iconAnchor: [28, 28], // Centro del marcador (56 / 2 = 28)
+  });
 
-    return (
-        <>
-            <Marker
-                position={position}
-                icon={icon}
-                eventHandlers={{
-                    mouseover: () => setHover(true),
-                    mouseout: () => setHover(false),
-                }}
-            />
-            {hover &&
-                createPortal(
-                    <div
-                        className="absolute z-[999] pointer-events-none"
-                        style={{
-                            left: map.latLngToContainerPoint(position).x - offsetX,
-                            top: map.latLngToContainerPoint(position).y - offsetY,
-                        }}
-                    >
-                        <div className="w-64">
-                            <TarjetaMascota mascota={mascota} usuarioActualId={usuarioActualId} />
-                        </div>
-                    </div>,
-                    document.getElementById('map-tooltip-root')!
-                )}
-
-        </>
-    );
+  return (
+    <Marker position={[mascota.latitud, mascota.longitud] as LatLngExpression} icon={icon}>
+      <Popup
+        autoClose={false}
+        closeOnClick={false}
+        closeOnEscapeKey={true}
+        maxWidth={350}
+        offset={[0, -28]} // Ajustado para marcador más grande
+        className="custom-popup" // Clase para personalizar estilos
+      >
+        <TarjetaMascota
+          mascota={mascota}
+          user={user}
+          isDeseado={isDeseado(mascota.mascotaId)}
+          toggleDeseado={toggleDeseado}
+        />
+      </Popup>
+    </Marker>
+  );
 };
 
 export default CustomMarker;

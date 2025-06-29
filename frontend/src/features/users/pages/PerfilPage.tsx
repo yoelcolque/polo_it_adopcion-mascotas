@@ -49,9 +49,6 @@ const PerfilPage = () => {
     const { logout } = useAuth();
     return (
         <div className="min-h-screen p-6 bg-background font-sans">
-            <button onClick={logout} className="text-error hover:underline">
-                Cerrar sesión
-            </button>
             <div className="grid grid-cols-[150px_1fr_1fr] grid-rows-[auto_auto_auto] gap-4">
                 {/* Imagen */}
                 <div className="row-span-2 flex justify-center items-center">

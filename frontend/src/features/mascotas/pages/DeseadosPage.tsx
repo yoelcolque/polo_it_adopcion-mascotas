@@ -1,56 +1,62 @@
 import { useEffect, useState } from 'react';
-import TarjetaMascota from '../components/TarjetaMascota';
 import axiosInstance from '../../../shared/api/axios';
 import { useAuth } from '../../auth/context/AuthProvider';
+import TarjetaMascota from '../components/TarjetaMascota';
+
+interface Mascota {
+  mascotaId: number;
+  nombre: string;
+  duenoEmail: string;
+  especieMascota?: string;
+  edad?: number;
+  descripcion?: string;
+  imagen?: string;
+  contactoUrl?: string;
+  usuarioId?: number;
+  estado?: string;
+}
 
 const DeseadosPage = () => {
-    const { accessToken, user } = useAuth();
-    const [mascotas, setMascotas] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+  const { user, accessToken } = useAuth();
+  const [mascotas, setMascotas] = useState<Mascota[]>([]);
 
-    useEffect(() => {
-        if (!accessToken) return;
+  useEffect(() => {
+    const fetchDeseados = async () => {
+      if (!user || !accessToken) {
+        console.log('No user or accessToken, skipping fetchDeseados', { user, accessToken });
+        setMascotas([]);
+        return;
+      }
+      try {
+        console.log('Fetching deseados from /deseados with token:', accessToken);
+        const res = await axiosInstance.get('/deseados', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        console.log('Deseados response:', JSON.stringify(res.data, null, 2));
+        setMascotas(res.data.mascotas || []);
+      } catch (err: any) {
+        console.error('Error al obtener mascotas deseadas:', err.response?.data || err.message);
+        setMascotas([]);
+      }
+    };
 
-        axiosInstance.get('/deseados')
-            .then(res => {
-                setMascotas(res.data?.mascotas || []);
-            })
-            .catch(err => {
-                console.error("Error al obtener mascotas deseadas:", err);
-            })
-            .finally(() => setLoading(false));
-    }, [accessToken]);
+    fetchDeseados();
+  }, [user, accessToken]);
 
-    return (
-        <div className="p-6 bg-background min-h-screen font-sans">
-            <h1 className="text-3xl font-heading text-text mb-8">Mascotas deseadas</h1>
-
-            {loading ? (
-                <p className="text-muted">Cargando...</p>
-            ) : mascotas.length === 0 ? (
-                <p className="text-muted">Aún no has marcado ninguna mascota como deseada.</p>
-            ) : (
-                <div className="space-y-6">
-                    {mascotas.map(m => (
-                        <TarjetaMascota
-                            key={m.mascotaId}
-                            mascota={{
-                                mascotaId: m.mascotaId,
-                                nombre: m.nombre,
-                                especieMascota: m.especieMascota,
-                                edad: m.edad,
-                                descripcion: m.temperamento || 'Sin descripción disponible',
-                                imagen: m.imagen || '/placeholder.png',
-                                contactoUrl: `/perfil/${m.mascotaId}`,
-                                usuarioId: m.usuarioId
-                            }}
-                            usuarioActualId={user?.usuarioId || 0}
-                        />
-                    ))}
-                </div>
-            )}
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Mis Mascotas Deseadas</h1>
+      {mascotas.length === 0 ? (
+        <p>Aún no has marcado ninguna mascota como deseada.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {mascotas.map((mascota) => (
+            <TarjetaMascota key={mascota.mascotaId} mascota={mascota} />
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default DeseadosPage;

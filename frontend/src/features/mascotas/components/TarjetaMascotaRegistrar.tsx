@@ -9,19 +9,20 @@ type Props = {
 
 const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
     const [imagenPreview, setImagenPreview] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
     const [form, setForm] = useState({
         nombre: '',
-        especie: '',  // PERRO / GATO
-        sexo: '',     // MACHO / HEMBRA
+        especie: '',
+        sexo: '',
         edad: '',
-        descripcion: '', // Se usará como temperamento
+        descripcion: '',
         imagen: null as File | null,
         calle: '',
         numero: '',
         barrio: '',
         ciudad: '',
-        pais: 'Argentina', // valor por defecto (Por defecto es solo Argentina)
+        pais: 'Argentina',
     });
 
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                         sexo: sexoMascota || '',
                         edad: typeof edad === 'number' ? edad.toString() : '',
                         descripcion: temperamento || '',
-                        imagen: null, // No cargamos archivo aquí
+                        imagen: null,
                     }));
                     setImagenPreview(imagen || null);
                 })
@@ -61,21 +62,33 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
         }
     }, [mascotaId]);
 
-
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
+        if (name === 'descripcion' && value.length > 255) {
+            setError('La descripción no puede exceder los 255 caracteres.');
+            return;
+        }
+        setError(null); // Limpiar error si es válido
         setForm(prev => ({ ...prev, [name]: value }));
     };
-
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         setForm(prev => ({ ...prev, imagen: file }));
+        if (file) {
+            setImagenPreview(URL.createObjectURL(file));
+        }
     };
 
     const handleSubmit = async () => {
+        // Validar longitud de descripción antes de enviar
+        if (form.descripcion.length > 255) {
+            setError('La descripción no puede exceder los 255 caracteres.');
+            return;
+        }
+
         try {
             if (mascotaId) {
                 const formData = new FormData();
@@ -93,19 +106,16 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-
             } else {
                 const direccionCompleta = `${form.calle} ${form.numero}, ${form.barrio}, ${form.ciudad}, ${form.pais}`;
                 const geo = await obtenerGeocodificacionLimpia(direccionCompleta);
 
-                // POST con imagen y temperamento usando FormData
                 const formData = new FormData();
                 formData.append('nombre', form.nombre);
                 formData.append('edad', form.edad);
                 formData.append('especieMascota', form.especie.toUpperCase());
                 formData.append('sexoMascota', form.sexo.toUpperCase());
                 formData.append('temperamento', form.descripcion);
-
                 formData.append('ubicacionTexto', geo.direccion);
                 formData.append('latitud', geo.latitud.toString());
                 formData.append('longitud', geo.longitud.toString());
@@ -122,14 +132,22 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
             }
 
             navigate('/home');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error al guardar:', error);
-            alert('Ocurrió un error al guardar la mascota.');
+            const errorMessage = error.response?.data?.message || 'Ocurrió un error al guardar la mascota.';
+            setError(errorMessage);
         }
     };
 
     return (
         <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-lg flex flex-col gap-6">
+            {/* Mensaje de error */}
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+                    {error}
+                </div>
+            )}
+
             {/* Imagen */}
             <div className="flex justify-center">
                 <label
@@ -160,7 +178,6 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                         </>
                     )}
                 </label>
-
                 <input
                     id="imagen"
                     type="file"
@@ -175,11 +192,11 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                 {[
                     { label: 'Nombre', name: 'nombre', type: 'text' },
                     { label: 'Edad', name: 'edad', type: 'number', min: 0, max: 25 },
-                    { label: 'Calle', name: 'calle' },
-                    { label: 'Número', name: 'numero' },
-                    { label: 'Barrio', name: 'barrio' },
-                    { label: 'Ciudad', name: 'ciudad' },
-                    { label: 'País', name: 'pais' },
+                    { label: 'Calle', name: 'calle', type: 'text' },
+                    { label: 'Número', name: 'numero', type: 'text' },
+                    { label: 'Barrio', name: 'barrio', type: 'text' },
+                    { label: 'Ciudad', name: 'ciudad', type: 'text' },
+                    { label: 'País', name: 'pais', type: 'text' },
                 ].map(({ label, name, type = 'text', min, max }, idx) => (
                     <div key={idx} className="relative w-full">
                         <label
@@ -205,7 +222,7 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                 ))}
             </div>
 
-            {/* selects */}
+            {/* Selects */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                     { label: 'Especie', name: 'especie', options: ['', 'PERRO', 'GATO'] },
@@ -231,7 +248,7 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                 ))}
             </div>
 
-            {/* descripcion */}
+            {/* Descripción */}
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
                 <textarea
@@ -239,11 +256,16 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
                     value={form.descripcion}
                     onChange={handleChange}
                     rows={3}
+                    maxLength={255} // Limita la entrada a 255 caracteres
                     className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#096A7F]"
+                    placeholder="Ingresá una descripción (máximo 255 caracteres)"
                 />
+                <p className="text-sm text-gray-500 mt-1">
+                    Caracteres: {form.descripcion.length}/255
+                </p>
             </div>
 
-            {/* boton summnut */}
+            {/* Botón submit */}
             <div className="flex justify-center mt-4">
                 <button
                     onClick={handleSubmit}
@@ -254,7 +276,6 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
             </div>
         </div>
     );
-
 };
 
 export default TarjetaMascotaRegistrar;
