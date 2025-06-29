@@ -48,7 +48,7 @@ const DetalleMascotaPage = () => {
                     className="w-full h-64 object-cover"
                 />
 
-                {/* Descripcion */}
+                {/* Descripción general */}
                 <div className="p-4">
                     <p className="text-sm text-text">{mascota.descripcion}</p>
                 </div>
@@ -66,17 +66,60 @@ const DetalleMascotaPage = () => {
                         />
                     </button>
 
-                    {/* Contenido principal */}
                     <div className="gap-6 flex flex-col justify-between items-start mb-2">
                         <h3 className="text-md font-semibold text-text">Acerca de mí</h3>
-
                         <p className="text-muted text-sm whitespace-pre-line">
                             {mascota.temperamento || 'Sin descripción específica'}
                         </p>
                     </div>
                 </div>
-                {/* esto todavia no funciona pero hay una idea de como podria ser, ya que no se implemento sistema de comentarios ni reseñas */}
-                {/* Reseñas */}
+
+                {/* Información adicional de salud */}
+                <div className="p-4 border-t space-y-4">
+                    <h3 className="text-md font-semibold text-text mb-2">Salud y cuidados</h3>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-text">
+                        <div className="flex items-center justify-between border p-3 rounded bg-[#F5FAFA]">
+                            <span className="font-medium">Esterilizado</span>
+                            <span>{mascota.esterilizado ? 'Sí' : 'No'}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between border p-3 rounded bg-[#F5FAFA]">
+                            <span className="font-medium">Vacunado</span>
+                            <span>{mascota.vacunado ? 'Sí' : 'No'}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between border p-3 rounded bg-[#F5FAFA]">
+                            <span className="font-medium">Peso</span>
+                            <span>{mascota.peso ? `${mascota.peso} kg` : 'No especificado'}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between border p-3 rounded bg-[#F5FAFA]">
+                            <span className="font-medium">Pelaje</span>
+                            <span>{mascota.pelaje || 'No especificado'}</span>
+                        </div>
+                    </div>
+
+                    {mascota.historialMedico && (
+                        <div>
+                            <h4 className="font-semibold text-sm mb-1">Historial médico</h4>
+                            <p className="text-muted text-sm whitespace-pre-line bg-[#F5FAFA] p-3 rounded border">
+                                {mascota.historialMedico}
+                            </p>
+                        </div>
+                    )}
+
+                    {mascota.necesidades && (
+                        <div>
+                            <h4 className="font-semibold text-sm mb-1">Necesidades</h4>
+                            <p className="text-muted text-sm whitespace-pre-line bg-[#F5FAFA] p-3 rounded border">
+                                {mascota.necesidades}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Reseñas (mockeadas) */}
                 {mascota.resenas && mascota.resenas.length > 0 && (
                     <div className="p-4 border-t">
                         <h3 className="text-md font-semibold text-text mb-3">
@@ -86,7 +129,6 @@ const DetalleMascotaPage = () => {
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {mascota.resenas.map((resena: any, index: number) => (
                                 <div key={index} className="bg-[#CDEDF2] rounded-md p-3 shadow-sm text-sm">
-                                    {/* Nombre + Avatar */}
                                     <div className="flex items-center gap-2 mb-1">
                                         <img
                                             src={resena.autor?.foto || '/placeholder.png'}
@@ -96,7 +138,6 @@ const DetalleMascotaPage = () => {
                                         <strong>{resena.autor?.nombre}</strong>
                                     </div>
 
-                                    {/* Estrellas (posdata solo es icon puesto, osea no es dinamico, aun no se implento sistema de reseñas) */}
                                     <div className="flex items-center gap-1 mb-1">
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <img
@@ -108,12 +149,10 @@ const DetalleMascotaPage = () => {
                                         ))}
                                     </div>
 
-                                    {/* Texto */}
                                     <p className="text-text text-sm mb-1 line-clamp-3">
                                         {resena.comentario}
                                     </p>
 
-                                    {/* Fsecha */}
                                     <p className="text-xs text-muted">
                                         {new Date(resena.fecha).toLocaleDateString('es-AR', {
                                             year: 'numeric',
@@ -125,7 +164,6 @@ const DetalleMascotaPage = () => {
                         </div>
                     </div>
                 )}
-
             </div>
         </div>
     );

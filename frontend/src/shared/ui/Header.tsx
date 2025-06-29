@@ -20,7 +20,7 @@ const Header = () => {
             className={classNames(
                 'bg-[#006775] shadow-md flex items-center justify-around',
                 'fixed bottom-0 w-full h-[70px] z-20',
-                'md:static md:flex-col md:justify-start md:items-center',
+                'md:static md:flex-col md:justify-start md:items-center md:gap-8',
                 'md:w-[85px] md:min-h-screen md:h-auto md:py-6'
             )}
         >
@@ -70,11 +70,21 @@ const Header = () => {
 
             {/* Botón Cerrar sesión, solo si está logueado */}
             {user && (
-                <button onClick={logout} className="mb-4 flex flex-col items-center cursor-pointer">
-                    <img src="/logout.png" alt="Cerrar sesión" className="h-6 w-6" />
-                    <span className="text-xs text-white/70">Salir</span>
+                <button
+                    onClick={logout}
+                    className="flex flex-col items-center cursor-pointer gap-1"
+                    aria-label="Cerrar sesión"
+                    title="Cerrar sesión"
+                >
+                    <img
+                        src="/logout.png"
+                        alt="Cerrar sesión"
+                        className="h-6 w-6 transition-transform duration-200 group-hover:scale-110"
+                    />
+                    <span className="text-xs text-white/90 group-hover:text-white font-semibold transition-colors duration-200">
+                        Salir
+                    </span>
                 </button>
-
             )}
         </aside>
     );

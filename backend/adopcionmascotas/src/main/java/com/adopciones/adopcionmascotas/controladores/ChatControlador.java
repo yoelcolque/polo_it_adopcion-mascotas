@@ -44,7 +44,7 @@ public class ChatControlador {
     @GetMapping("/obtener-o-crear")
     public Response obtenerOCrearChat(
             @AuthenticationPrincipal Usuario currentUser,
-            @RequestParam Long duenoId,
+            @RequestParam String duenoEmail,
             @RequestParam Long mascotaId
     ) {
         Response response = new Response();
@@ -53,7 +53,7 @@ public class ChatControlador {
                 throw new OurException("Usuario no autenticado.");
             }
 
-            Optional<Usuario> duenoOpt = usuarioRepositorio.findById(duenoId);
+            Optional<Usuario> duenoOpt = usuarioRepositorio.findByEmail(duenoEmail);
             if (!duenoOpt.isPresent()) {
                 throw new OurException("Dueño no encontrado.");
             }

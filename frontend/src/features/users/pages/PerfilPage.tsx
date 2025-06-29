@@ -46,7 +46,6 @@ const PerfilPage = () => {
         return <p className="p-6 text-error">No se pudo cargar el perfil del usuario.</p>;
     }
 
-    const { logout } = useAuth();
     return (
         <div className="min-h-screen p-6 bg-background font-sans">
             <div className="grid grid-cols-[150px_1fr_1fr] grid-rows-[auto_auto_auto] gap-4">
@@ -86,10 +85,10 @@ const PerfilPage = () => {
                                         contactoUrl: `/perfil/${m.mascotaId}`,
                                         usuarioId: m.usuarioId,
                                         estado: m.estado,
+                                        duenoEmail: usuario.email, // PASO email dueño para comparación
                                     }}
-                                    usuarioActualId={usuario.usuarioId}
+                                    user={{ email: usuario.email }} // PASO usuario actual para comparar
                                 />
-
                             ))
                         )}
                     </div>

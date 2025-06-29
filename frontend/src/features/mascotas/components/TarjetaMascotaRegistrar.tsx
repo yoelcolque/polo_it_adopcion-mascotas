@@ -3,137 +3,107 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../shared/api/axios';
 import { obtenerGeocodificacionLimpia } from '../../../shared/api/geocodingLimpio';
 
-type Props = {
-    mascotaId?: string;
-};
-
-const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
+const TarjetaMascotaRegistrar = ({ mascotaId }: { mascotaId?: string }) => {
     const [imagenPreview, setImagenPreview] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null); // Estado para manejar errores
+    const [error, setError] = useState<string | null>(null);
 
     const [form, setForm] = useState({
-        nombre: '',
-        especie: '',
-        sexo: '',
-        edad: '',
-        descripcion: '',
+        nombre: '', especie: '', sexo: '', edad: '', descripcion: '',
         imagen: null as File | null,
-        calle: '',
-        numero: '',
-        barrio: '',
-        ciudad: '',
-        pais: 'Argentina',
+        calle: '', barrio: '', ciudad: '', pais: 'Argentina',
+        historial_medico: '', necesidades: '', peso: '', pelaje: '',
+        esterilizado: false, vacunado: false,
     });
 
     const navigate = useNavigate();
 
-    // Cargar datos si es edición
     useEffect(() => {
         if (mascotaId) {
             axiosInstance.get(`/mascota/${mascotaId}`)
                 .then(res => {
                     const mascota = res.data?.mascota;
                     if (!mascota) return;
-
                     const {
-                        nombre,
-                        especieMascota,
-                        sexoMascota,
-                        edad,
-                        temperamento,
-                        imagen
+                        nombre, especieMascota, sexoMascota, edad,
+                        temperamento, imagen,
+                        historial_medico, necesidades, peso,
+                        pelaje, esterilizado, vacunado
                     } = mascota;
 
                     setForm(prev => ({
                         ...prev,
-                        nombre: nombre || '',
-                        especie: especieMascota || '',
+                        nombre: nombre || '', especie: especieMascota || '',
                         sexo: sexoMascota || '',
                         edad: typeof edad === 'number' ? edad.toString() : '',
-                        descripcion: temperamento || '',
-                        imagen: null,
+                        descripcion: temperamento || '', imagen: null,
+                        historial_medico: historial_medico || '',
+                        necesidades: necesidades || '',
+                        peso: peso?.toString() || '', pelaje: pelaje || '',
+                        esterilizado: !!esterilizado, vacunado: !!vacunado,
                     }));
                     setImagenPreview(imagen || null);
                 })
-                .catch(err => {
-                    console.error('Error al cargar la mascota:', err);
-                    alert('Error al obtener datos de la mascota.');
-                });
+                .catch(() => alert('Error al obtener datos de la mascota.'));
         }
     }, [mascotaId]);
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
+    const handleChange = (e: React.ChangeEvent<any>) => {
+        const { name, value, type, checked } = e.target;
+        const val = type === 'checkbox' ? checked : value;
         if (name === 'descripcion' && value.length > 255) {
             setError('La descripción no puede exceder los 255 caracteres.');
             return;
         }
-        setError(null); // Limpiar error si es válido
-        setForm(prev => ({ ...prev, [name]: value }));
+        setError(null);
+        setForm(prev => ({ ...prev, [name]: val }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         setForm(prev => ({ ...prev, imagen: file }));
-        if (file) {
-            setImagenPreview(URL.createObjectURL(file));
-        }
+        if (file) setImagenPreview(URL.createObjectURL(file));
     };
 
     const handleSubmit = async () => {
-        // Validar longitud de descripción antes de enviar
         if (form.descripcion.length > 255) {
             setError('La descripción no puede exceder los 255 caracteres.');
             return;
         }
 
         try {
-            if (mascotaId) {
-                const formData = new FormData();
-                formData.append('nombre', form.nombre);
-                formData.append('edad', form.edad);
-                formData.append('especieMascota', form.especie.toUpperCase());
-                formData.append('sexoMascota', form.sexo.toUpperCase());
-                formData.append('temperamento', form.descripcion);
-                if (form.imagen) {
-                    formData.append('imagen', form.imagen);
-                }
+            const formData = new FormData();
+            formData.append('nombre', form.nombre);
+            formData.append('edad', form.edad);
+            formData.append('especieMascota', form.especie.toUpperCase());
+            formData.append('sexoMascota', form.sexo.toUpperCase());
+            formData.append('temperamento', form.descripcion);
+            formData.append('historial_medico', form.historial_medico);
+            formData.append('necesidades', form.necesidades);
+            formData.append('peso', form.peso);
+            formData.append('pelaje', form.pelaje);
+            formData.append('esterilizado', form.esterilizado.toString());
+            formData.append('vacunado', form.vacunado.toString());
 
+            if (form.imagen) formData.append('imagen', form.imagen);
+
+            if (mascotaId) {
                 await axiosInstance.put(`/mascota/editar/${mascotaId}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
             } else {
-                const direccionCompleta = `${form.calle} ${form.numero}, ${form.barrio}, ${form.ciudad}, ${form.pais}`;
-                const geo = await obtenerGeocodificacionLimpia(direccionCompleta);
-
-                const formData = new FormData();
-                formData.append('nombre', form.nombre);
-                formData.append('edad', form.edad);
-                formData.append('especieMascota', form.especie.toUpperCase());
-                formData.append('sexoMascota', form.sexo.toUpperCase());
-                formData.append('temperamento', form.descripcion);
+                const geo = await obtenerGeocodificacionLimpia(
+                    `${form.calle}, ${form.barrio}, ${form.ciudad}, ${form.pais}`
+                );
                 formData.append('ubicacionTexto', geo.direccion);
                 formData.append('latitud', geo.latitud.toString());
                 formData.append('longitud', geo.longitud.toString());
 
-                if (form.imagen) {
-                    formData.append('imagen', form.imagen);
-                }
-
                 await axiosInstance.post('/mascota/agregar', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
             }
-
             navigate('/home');
         } catch (error: any) {
-            console.error('Error al guardar:', error);
             const errorMessage = error.response?.data?.message || 'Ocurrió un error al guardar la mascota.';
             setError(errorMessage);
         }
@@ -141,107 +111,45 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
 
     return (
         <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-lg flex flex-col gap-6">
-            {/* Mensaje de error */}
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
-                    {error}
-                </div>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">{error}</div>
             )}
 
             {/* Imagen */}
             <div className="flex justify-center">
-                <label
-                    htmlFor="imagen"
-                    className="w-32 h-32 border-2 border-[#096A7F] bg-gray-100 flex flex-col items-center justify-center rounded-md cursor-pointer hover:bg-gray-200 transition overflow-hidden"
-                >
-                    {form.imagen ? (
-                        <img
-                            src={URL.createObjectURL(form.imagen)}
-                            alt="Previsualización"
-                            className="w-full h-full object-cover"
-                        />
-                    ) : imagenPreview ? (
-                        <img src={imagenPreview} alt="Imagen actual" className="w-full h-full object-cover" />
-                    ) : (
-                        <>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="w-6 h-6 text-[#096A7F] mb-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                      d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4" />
-                            </svg>
-                            <span className="text-xs text-[#096A7F] font-semibold">Subir imagen</span>
-                        </>
-                    )}
+                <label htmlFor="imagen" className="w-32 h-32 border-2 border-[#096A7F] bg-gray-100 flex flex-col items-center justify-center rounded-md cursor-pointer hover:bg-gray-200 overflow-hidden">
+                    {form.imagen
+                        ? <img src={URL.createObjectURL(form.imagen)} className="w-full h-full object-cover" />
+                        : imagenPreview
+                            ? <img src={imagenPreview} className="w-full h-full object-cover" />
+                            : <span className="text-sm text-[#096A7F]">Subir imagen</span>
+                    }
                 </label>
-                <input
-                    id="imagen"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                />
+                <input id="imagen" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </div>
 
-            {/* Campos con íconos */}
+            {/* Campos básicos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                    { label: 'Nombre', name: 'nombre', type: 'text' },
-                    { label: 'Edad', name: 'edad', type: 'number', min: 0, max: 25 },
-                    { label: 'Calle', name: 'calle', type: 'text' },
-                    { label: 'Número', name: 'numero', type: 'text' },
-                    { label: 'Barrio', name: 'barrio', type: 'text' },
-                    { label: 'Ciudad', name: 'ciudad', type: 'text' },
-                    { label: 'País', name: 'pais', type: 'text' },
-                ].map(({ label, name, type = 'text', min, max }, idx) => (
-                    <div key={idx} className="relative w-full">
-                        <label
-                            htmlFor={name}
-                            className="absolute -top-2 left-3 px-1 bg-white text-sm text-[#02191E] z-10"
-                        >
-                            {label}
-                        </label>
-                        <div className="flex items-center h-[60px] border border-[#E8672D] rounded-md px-3 py-2">
-                            <input
-                                id={name}
-                                name={name}
-                                type={type}
-                                value={(form as any)[name]}
-                                onChange={handleChange}
-                                placeholder={`Ingresá ${label.toLowerCase()}`}
-                                min={min}
-                                max={max}
-                                className="flex-1 outline-none text-sm text-gray-700 placeholder:text-gray-400"
-                            />
-                        </div>
+                {[['Nombre', 'nombre'], ['Edad', 'edad'], ['Calle', 'calle'], ['Barrio', 'barrio'], ['Ciudad', 'ciudad'], ['País', 'pais']].map(([label, name]) => (
+                    <div key={name} className="relative">
+                        <label htmlFor={name} className="absolute -top-2 left-3 px-1 bg-white text-sm text-[#02191E]">{label}</label>
+                        <input
+                            id={name} name={name} value={(form as any)[name]}
+                            onChange={handleChange} placeholder={`Ingresá ${label.toLowerCase()}`}
+                            className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm"
+                        />
                     </div>
                 ))}
             </div>
 
             {/* Selects */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                    { label: 'Especie', name: 'especie', options: ['', 'PERRO', 'GATO'] },
-                    { label: 'Sexo', name: 'sexo', options: ['', 'MACHO', 'HEMBRA'] }
-                ].map(({ label, name, options }, i) => (
-                    <div key={i}>
+                {[['Especie', 'especie', ['', 'PERRO', 'GATO']], ['Sexo', 'sexo', ['', 'MACHO', 'HEMBRA']]].map(([label, name, options]: any) => (
+                    <div key={name}>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
-                        <select
-                            name={name}
-                            value={(form as any)[name]}
-                            onChange={handleChange}
-                            className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#096A7F]"
-                        >
-                            {options.map((option, j) => (
-                                <option key={j} value={option}>
-                                    {option === ''
-                                        ? `Seleccioná ${label.toLowerCase()}`
-                                        : option.charAt(0) + option.slice(1).toLowerCase()}
-                                </option>
+                        <select name={name} value={(form as any)[name]} onChange={handleChange} className="w-full border border-[#E8672D] rounded-md px-3 py-2">
+                            {options.map((opt: string) => (
+                                <option key={opt} value={opt}>{opt ? opt.charAt(0) + opt.slice(1).toLowerCase() : `Seleccioná ${label.toLowerCase()}`}</option>
                             ))}
                         </select>
                     </div>
@@ -251,26 +159,41 @@ const TarjetaMascotaRegistrar = ({ mascotaId }: Props) => {
             {/* Descripción */}
             <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
-                <textarea
-                    name="descripcion"
-                    value={form.descripcion}
-                    onChange={handleChange}
-                    rows={3}
-                    maxLength={255} // Limita la entrada a 255 caracteres
-                    className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#096A7F]"
-                    placeholder="Ingresá una descripción (máximo 255 caracteres)"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                    Caracteres: {form.descripcion.length}/255
-                </p>
+                <textarea name="descripcion" value={form.descripcion} onChange={handleChange} rows={3} maxLength={255} className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm" placeholder="Ingresá una descripción" />
+                <p className="text-sm text-gray-500">Caracteres: {form.descripcion.length}/255</p>
             </div>
 
-            {/* Botón submit */}
+            {/* Campos adicionales */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[['Historial Médico', 'historial_medico'], ['Necesidades', 'necesidades']].map(([label, name]) => (
+                    <div key={name}>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
+                        <textarea name={name} value={(form as any)[name]} onChange={handleChange} rows={2} className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm" placeholder={label} />
+                    </div>
+                ))}
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Peso (kg)</label>
+                    <input name="peso" type="number" value={form.peso} onChange={handleChange} min={0} step="0.1" className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Pelaje</label>
+                    <input name="pelaje" type="text" value={form.pelaje} onChange={handleChange} className="w-full border border-[#E8672D] rounded-md px-3 py-2 text-sm" />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input type="checkbox" name="esterilizado" checked={form.esterilizado} onChange={handleChange} />
+                    <label className="text-sm text-gray-700">Esterilizado</label>
+                </div>
+                <div className="flex items-center gap-2">
+                    <input type="checkbox" name="vacunado" checked={form.vacunado} onChange={handleChange} />
+                    <label className="text-sm text-gray-700">Vacunado</label>
+                </div>
+            </div>
+
             <div className="flex justify-center mt-4">
-                <button
-                    onClick={handleSubmit}
-                    className="px-8 py-2 rounded-full bg-[#006775] text-white font-semibold hover:bg-[#004f5a] transition"
-                >
+                <button onClick={handleSubmit} className="px-8 py-2 rounded-full bg-[#006775] text-white font-semibold hover:bg-[#004f5a]">
                     {mascotaId ? 'Actualizar mascota' : 'Registrar mascota'}
                 </button>
             </div>

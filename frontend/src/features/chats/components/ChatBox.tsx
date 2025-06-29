@@ -23,11 +23,9 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
     try {
       setLoading(true);
       const res = await obtenerMensajes(chatId);
-      console.log("ChatBox - Respuesta de mensajes:", res);
       setMensajes(res.objeto || []);
       setError(null);
     } catch (error: any) {
-      console.error("ChatBox - Error cargando mensajes:", error);
       setError(error.response?.data?.message || "Error al cargar los mensajes");
     } finally {
       setLoading(false);
@@ -42,7 +40,6 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
 
     try {
       setError(null);
-      // Determinar emisorId y receptorId desde chat
       const emisorId =
         user.email === chat.adoptante.email
           ? chat.adoptante.usuarioId
@@ -62,13 +59,13 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
         receptorId,
         contenido,
       };
-      console.log("ChatBox - Enviando mensaje:", mensajeData);
-      const res = await enviarMensaje(mensajeData);
-      console.log("ChatBox - Respuesta de enviar mensaje:", res);
+
+      await enviarMensaje(mensajeData);
       setContenido("");
       await cargarMensajes();
+      // Scroll al final tras enviar
+      mensajesRef.current?.scrollTo({ top: mensajesRef.current.scrollHeight, behavior: "smooth" });
     } catch (error: any) {
-      console.error("ChatBox - Error enviando mensaje:", error);
       setError(error.message || "Error al enviar el mensaje");
     }
   };
@@ -78,7 +75,8 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
   }, [chatId]);
 
   useEffect(() => {
-    mensajesRef.current?.scrollTo(0, mensajesRef.current.scrollHeight);
+    // Scroll automático al cargar mensajes
+    mensajesRef.current?.scrollTo({ top: mensajesRef.current.scrollHeight, behavior: "smooth" });
   }, [mensajes]);
 
   if (loading) {
@@ -86,9 +84,9 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="flex flex-col w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg overflow-hidden h-[600px]">
       {/* Encabezado */}
-      <div className="bg-gray-50 p-4 border-b border-gray-200 flex items-center justify-between">
+      <header className="bg-gray-50 p-4 border-b border-gray-200 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
             Chat sobre {chat.mascota.nombre}
@@ -97,19 +95,24 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
         </div>
         <button
           onClick={() => navigate("/chat/mis-chats")}
-          className="text-blue-600 hover:text-blue-800"
+          className="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          aria-label="Volver a la lista de chats"
         >
           Volver
         </button>
-      </div>
+      </header>
 
       {/* Área de Mensajes */}
-      <div
+      <main
         ref={mensajesRef}
-        className="flex-1 h-96 p-4 overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+        className="flex-1 p-4 overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+        aria-live="polite"
+        aria-relevant="additions"
       >
         {error && (
-          <p className="text-red-500 text-center mb-2 font-medium">{error}</p>
+          <p className="text-red-500 text-center mb-2 font-medium" role="alert">
+            {error}
+          </p>
         )}
         {mensajes.length === 0 ? (
           <p className="text-gray-500 text-center mt-20">
@@ -118,18 +121,19 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
         ) : (
           <div className="space-y-2">
             {mensajes.map((msg, idx) => {
-              const isSentByUser = msg.emisorId === (user?.email === chat.adoptante.email ? chat.adoptante.usuarioId : chat.dueno.usuarioId);
+              const isSentByUser =
+                msg.emisorId === (user?.email === chat.adoptante.email ? chat.adoptante.usuarioId : chat.dueno.usuarioId);
               const isSameSenderAsPrevious =
                 idx > 0 && mensajes[idx - 1].emisorId === msg.emisorId;
               return (
                 <div
-                  key={idx}
-                  className={`flex ${
-                    isSentByUser ? "justify-end" : "justify-start"
-                  } ${isSameSenderAsPrevious ? "mt-1" : "mt-3"}`}
+                  key={msg.id || idx}
+                  className={`flex ${isSentByUser ? "justify-end" : "justify-start"} ${
+                    isSameSenderAsPrevious ? "mt-1" : "mt-3"
+                  }`}
                 >
                   <div
-                    className={`max-w-[70%] p-3 text-sm rounded-xl shadow-sm ${
+                    className={`max-w-[70%] p-3 text-sm rounded-xl shadow-sm break-words ${
                       isSentByUser
                         ? "bg-blue-600 text-white rounded-tl-xl rounded-bl-xl rounded-br-sm"
                         : "bg-gray-200 text-gray-900 rounded-tr-xl rounded-br-xl rounded-bl-sm"
@@ -139,9 +143,9 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
                     <p
                       className={`text-xs mt-1 ${
                         isSentByUser ? "text-blue-200" : "text-gray-500"
-                      } text-right`}
+                      } text-right select-none`}
                     >
-                      {new Date().toLocaleTimeString([], {
+                      {new Date(msg.fechaCreacion || Date.now()).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -152,25 +156,30 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
             })}
           </div>
         )}
-      </div>
+      </main>
 
       {/* Input y Botón */}
-      <div className="p-4 bg-gray-50 border-t border-gray-200 flex items-center gap-2">
-        <div className="flex-1 relative">
-          <input
-            className="w-full bg-gray-100 border border-gray-300 rounded-full px-4 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            value={contenido}
-            onChange={(e) => setContenido(e.target.value)}
-            placeholder="Escribí tu mensaje..."
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-            😊
-          </span>
-        </div>
+      <footer className="p-4 bg-gray-50 border-t border-gray-200 flex items-center gap-2">
+        <textarea
+          className="w-full bg-gray-100 border border-gray-300 rounded-md px-4 py-2 resize-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition max-h-24 overflow-auto"
+          value={contenido}
+          onChange={(e) => setContenido(e.target.value)}
+          placeholder="Escribí tu mensaje..."
+          rows={3}
+          aria-label="Escribí tu mensaje"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleEnviar();
+            }
+          }}
+        />
         <button
           onClick={handleEnviar}
           className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition disabled:bg-gray-400"
           disabled={!contenido.trim()}
+          aria-label="Enviar mensaje"
+          title="Enviar mensaje"
         >
           <svg
             className="w-5 h-5"
@@ -187,7 +196,7 @@ const ChatBox = ({ chatId, receptorEmail, chat }: ChatBoxProps) => {
             />
           </svg>
         </button>
-      </div>
+      </footer>
     </div>
   );
 };
